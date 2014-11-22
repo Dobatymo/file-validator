@@ -80,8 +80,6 @@ if __name__ == "__main__":
     parser.add_argument("DIRECTORY", nargs='+', help="directories to create report for")
     args = parser.parse_args()
 
-    print(args)
-
     if not os.path.isdir(args.reportdir):
         try:
             os.mkdir(args.reportdir)

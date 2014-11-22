@@ -8,6 +8,10 @@ A commandline program to generate xml reports about the validity of files. It sc
 
 Have python installed and execute 'validator.py --help'
 
+## Dependencies
+
+Needs rar.py from https://github.com/Dobatymo/pyutils in /plugins/
+
 ## How does it work?
 
 It loads plugins which handle one or more file extensions. Then for every file the right plugin is used to validate it and output the results to a xml file.

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 import sys, logging, subprocess
-from libs.archive import rar, RarError
+from rar import Rar, RarError
 
 from plug import Filetypes
 
@@ -26,7 +26,7 @@ class Archives(object):
             Executable = self.UnRarExecutable
             #args = u"t -p-"
             foundexe = False
-            r = rar(path, Executable)
+            r = Rar(path, Executable)
             try:
                 r.test()
                 return (0, "")
