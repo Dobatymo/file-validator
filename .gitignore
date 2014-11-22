@@ -53,5 +53,9 @@ docs/_build/
 # PyBuilder
 target/
 
+# Validator
 temp/
 reports/*.xml
+
+#Validator plugins
+plugins/rar.*
