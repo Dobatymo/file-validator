@@ -10,7 +10,14 @@ Have python installed and execute 'validator.py --help'
 
 ## Dependencies
 
-Needs rar.py from https://github.com/Dobatymo/pyutils in /plugins/
+main program:
+    none
+
+plugins:
+    Archives: unrar and 7z executable, set path in plugin. Needs rar.py from https://github.com/Dobatymo/pyutils in path.
+    Images: Python Imaging Library (PIL)
+    PDF: python library 'pyPdf'
+    Videos: ffmpeg executable, set path in plugin
 
 ## How does it work?
 
