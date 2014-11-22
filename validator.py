@@ -72,9 +72,9 @@ def main(DIRS, report_dir, xslfile, recursive):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description = "pyFileValidator")
+    parser = argparse.ArgumentParser(description="pyFileValidator", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     #parser.add_argument("-d", "--reportdir", dest="reportdir", default=os.path.join(os.getenv("APPDATA"), "pyFileValidator"), help="set output directory for reports")
-    parser.add_argument("-d", "--reportdir", dest="reportdir", default="reports", help="set output directory for reports")
+    parser.add_argument("-d", "--reportdir", dest="reportdir", default="./reports", help="set output directory for reports")
     parser.add_argument("-x", "--xsl", dest="xslfile", default="report.xsl", help="set xsl style sheet file")
     parser.add_argument("-r", "--recursive", dest="recursive", type=bool, default=True, help="scan directories recursively")
     parser.add_argument("DIRECTORY", nargs='+', help="directories to create report for")
