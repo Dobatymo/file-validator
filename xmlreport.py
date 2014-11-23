@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from xml.sax.saxutils import XMLGenerator
 from xml.sax.xmlreader import AttributesNSImpl
 

@@ -10,7 +10,7 @@ class PDF(object):
     
     def validate(self, path, ext):
         try:
-            with open(filename, "rb") as fr:
+            with open(path, "rb") as fr:
                 pdf = PdfFileReader(fr)
                 pdf.getDocumentInfo()
                 for p in pdf.pages:

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, absolute_import
 
-import os, os.path, logging
+import os, sys, os.path, logging
 from datetime import datetime
 
 from plug import Filetypes
@@ -43,7 +43,7 @@ def main(DIRS, report_dir, xslfile, recursive):
 
     for dir in DIRS:
         for path in scandir(dir, rec=recursive):
-            print(path)
+            logging.debug(path)
             ext = os.path.splitext(path)[1][1:].lower()
             
             if ext in no_validators:
@@ -58,26 +58,29 @@ def main(DIRS, report_dir, xslfile, recursive):
                         validators[ext] = validator = class_()
             if not validator:
                 no_validators.add(ext)
-                logging.debug("No validator found for file extension '{}'".format(ext))
+                logging.info("No validator found for file extension '{}'".format(ext))
                 continue
-            try:
-                code, message = validator.validate(os.path.abspath(path), ext)
-                report.write(path, str(code), message)
-                report.newline()
-            except Exception as e:
-                logger.exception("Validating '{}' failed".format(path))
+            """try:"""
+            code, message = validator.validate(os.path.abspath(path), ext)
+            report.write(path, str(code), message)
+            report.newline()
+            """except Exception as e:
+                logger.exception("Validating '{}' failed".format(path))"""
 
     report.close()
+
+def fs_string(bytestring):
+    return bytestring.decode(sys.getfilesystemencoding())
 
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="pyFileValidator", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    #parser.add_argument("-d", "--reportdir", dest="reportdir", default=os.path.join(os.getenv("APPDATA"), "pyFileValidator"), help="set output directory for reports")
-    parser.add_argument("-d", "--reportdir", dest="reportdir", default="./reports", help="set output directory for reports")
-    parser.add_argument("-x", "--xsl", dest="xslfile", default="report.xsl", help="set xsl style sheet file")
+    #parser.add_argument("-d", "--reportdir", dest="reportdir", type=fs_string, default=os.path.join(os.getenv("APPDATA"), "pyFileValidator"), help="set output directory for reports")
+    parser.add_argument("-d", "--reportdir", dest="reportdir", type=fs_string, default="./reports", help="set output directory for reports")
+    parser.add_argument("-x", "--xsl", dest="xslfile", type=fs_string, default="report.xsl", help="set xsl style sheet file")
     parser.add_argument("-r", "--recursive", dest="recursive", type=bool, default=True, help="scan directories recursively")
-    parser.add_argument("DIRECTORY", nargs='+', help="directories to create report for")
+    parser.add_argument("DIRECTORY", nargs='+', type=fs_string, help="directories to create report for")
     args = parser.parse_args()
 
     if not os.path.isdir(args.reportdir):
