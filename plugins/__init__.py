@@ -1,1 +1,1 @@
-__all__ = ["PDF", "TXT", "Archives", "Images", "Videos", "Python"]
+__all__ = ["PDF", "TXT", "Archives", "Images", "Videos", "Python", "FLAC"]
