@@ -9,14 +9,16 @@ logger.addHandler(logging.NullHandler())
 @Filetypes.plugin(["flac"])
 class FLAC(object):
 
-    executable = "D:/SYSTEM/Programs (x86)/FLAC v1.3.0/flac.exe"
-
-    def __init__(self):
-        pass
+    def __init__(self, executable, warnings_as_errors = True):
+        self.executable = executable
+        self.wae = warnings_as_errors
     
     def validate(self, path, ext):
         try:
-            cmd = '"{}" -t -s -w "{}"'.format(self.executable, path)
+            if self.wae:
+                cmd = '"{}" -t -s -w "{}"'.format(self.executable, path)
+            else:
+                cmd = '"{}" -t -s "{}"'.format(self.executable, path)
             ret = subprocess.check_output(cmd.encode(sys.getfilesystemencoding()), stderr=subprocess.STDOUT)
             return (0, "")
         except subprocess.CalledProcessError as e:

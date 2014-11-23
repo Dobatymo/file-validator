@@ -10,11 +10,10 @@ logger.addHandler(logging.NullHandler())
 @Filetypes.plugin(["zip", "cbz", "7z", "gz", "bz2", "z", "tar", "tgz", "tbz", "rar", "cbr"])
 class Archives(object):
 
-    UnRarExecutable = "C:/Program Files/WinRAR/UnRAR.exe"
-    SevenZipExecutable = "C:/Program Files/7-Zip/7z.exe"
-
-    def __init__(self):
-        pass
+    def __init__(self, UnRarExecutable="C:/Program Files/WinRAR/UnRAR.exe",
+        SevenZipExecutable="C:/Program Files/7-Zip/7z.exe"):
+        self.UnRarExecutable = UnRarExecutable
+        self.SevenZipExecutable = SevenZipExecutable
     
     def validate(self, path, ext):
 

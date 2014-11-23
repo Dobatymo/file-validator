@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, absolute_import
 
-import os, sys, os.path, logging
+import os, sys, io, json, os.path, logging
 from datetime import datetime
 
 from plug import Filetypes
@@ -55,7 +55,19 @@ def main(DIRS, report_dir, xslfile, recursive):
             except KeyError:
                 for class_, extensions in Filetypes.PLUGINS.iteritems():
                     if ext in extensions:
-                        validators[ext] = validator = class_()
+                        try:
+                            with io.open("config/{}.json".format(class_.__name__), "r", encoding="utf-8") as fr:
+                                config = json.load(fr)
+                        except IOError:
+                            logging.info("Could not find config for '{}'".format(class_.__name__))
+                            config = {}
+                        except ValueError:
+                            logging.exception("Could not load config for '{}'".format(class_.__name__))
+                            config = {}
+                        try:
+                            validators[ext] = validator = class_(**config)
+                        except TypeError:
+                            logging.error("Cannot use '{}' without config".format(class_.__name__))
             if not validator:
                 no_validators.add(ext)
                 logging.info("No validator found for file extension '{}'".format(ext))

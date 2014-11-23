@@ -9,15 +9,13 @@ logger.addHandler(logging.NullHandler())
 @Filetypes.plugin(["avi", "mkv", "webm", "mp4", "m4v", "ogm", "ogv", "wmv", "divx", "asf", "nsv", "mpg", "vob", "flv", "f4v", "mov", "rm", "rmvb"])
 class Videos(object):
 
-    ffmpeg = "D:/SYSTEM/Programs (x64)/FFmpeg/bin/ffmpeg.exe"
+    def __init__(self, ffmpeg):
+        self.ffmpeg = ffmpeg
 
-    def __init__(self):
-        pass
-    
     def validate(self, path, ext):
-        cmd = "{path} -v error -nostats -i \"{filename}\" -f null -"
+        cmd = "{path} -v error -nostats -i \"{filename}\" -f null -".format(path=self.ffmpeg, filename=path)
         try:
-            output = subprocess.check_output(cmd.format(path=self.ffmpeg, filename=path).encode(sys.getfilesystemencoding()), stderr=subprocess.STDOUT)
+            output = subprocess.check_output(cmd.encode(sys.getfilesystemencoding()), stderr=subprocess.STDOUT)
             if output:
                 return (1, output)
             else:
