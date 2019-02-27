@@ -17,6 +17,7 @@ Have python installed and execute 'validator.py --help'
     * Images: Python Imaging Library (PIL)
     * PDF: python library 'pyPdf'
     * Videos: ffmpeg executable, set path in plugin
+    * FLAC: flac executable, set path in plugin
 
 ## How does it work?
 

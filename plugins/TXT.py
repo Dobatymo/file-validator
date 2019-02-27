@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from plug import Filetypes
 
 @Filetypes.plugin(["txt"])

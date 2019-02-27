@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 import os, os.path, logging, re
 
-import Image
+from PIL import Image
 
 from plug import Filetypes
 

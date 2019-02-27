@@ -1,9 +1,11 @@
-from __future__ import unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+from io import open
 from xml.sax.saxutils import XMLGenerator
 from xml.sax.xmlreader import AttributesNSImpl
 
-class xmlreport:
+class xmlreport(object):
+
     def __init__(self, filename, xslfile):
         self.fp = open(filename, "wb")
         self.xmlgen = XMLGenerator(self.fp, "utf-8")
@@ -11,6 +13,12 @@ class xmlreport:
         self.xmlgen.processingInstruction("xml-stylesheet", 'type="text/xsl" href="{}"'.format(xslfile))
         attrs = AttributesNSImpl({}, {})
         self.xmlgen.startElementNS((None, "report"), "report", attrs)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback)
+        self.close()
 
     def write(self, path, code, message):
         attr_vals = {
