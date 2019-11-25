@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 from plug import Filetypes
 
-from Utilities.srt import SRTFile, MalformedFileException
+from genutility.fileformats.srt import SRTFile, MalformedFile
 
 @Filetypes.plugin(["srt"])
 class SRT(object):
@@ -16,5 +16,5 @@ class SRT(object):
             return (0, "")
         except AssertionError as e:
             return (1, str(e))
-        except MalformedFileException as e:
+        except MalformedFile as e:
             return (1, str(e))

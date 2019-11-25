@@ -3,11 +3,12 @@ import sys, subprocess, logging
 
 from plug import Filetypes
 from genutility.twothree.filesystem import tofs
+from genutility.filesystem import fileextensions
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-@Filetypes.plugin(["avi", "mkv", "webm", "mp4", "m4v", "ogm", "ogv", "wmv", "divx", "asf", "nsv", "mpg", "vob", "flv", "f4v", "mov", "rm", "rmvb"])
+@Filetypes.plugin(fileextensions.video)
 class Videos(object):
 
     def __init__(self, ffmpeg):

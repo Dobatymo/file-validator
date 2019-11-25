@@ -1,6 +1,6 @@
 from plug import Filetypes
 
-@Filetypes.plugin(["py","pyw"])
+@Filetypes.plugin(["py", "pyw"])
 class Python(object):
     def __init__(self):
         pass

@@ -4,7 +4,7 @@ import os, os.path, logging
 from datetime import datetime
 
 from genutility.twothree.filesystem import tofs, fromfs, sbs
-from ferutility.json import read_json
+from genutility.json import read_json
 
 from plug import Filetypes
 from xmlreport import xmlreport

@@ -3,6 +3,8 @@ import os, os.path, logging, re
 
 from PIL import Image, TiffImagePlugin
 
+from genutility.stdio import errorquit, waitcontinue
+
 from plug import Filetypes
 
 logger = logging.getLogger(__name__)
@@ -13,8 +15,7 @@ class ImagesConvert(object):
     def __init__(self):
         self.covertbmp = True
         self.coverttiff = True
-        #self.convertpath = re.compile(r"^.:\\PUBLIC\\.*$")
-        self.convertpath = re.compile(r"^.:\\PRIVATE\\University\\Masterarbeit\\.*$")
+        self.convertpath = re.compile(r"^.:\\PUBLIC\\.*$")
 
     def copy_time(self, src, dst):
         t = os.path.getmtime(src)
@@ -54,5 +55,5 @@ class ImagesConvert(object):
                 logging.debug("{} doesn't match".format(path))
             return (0, "")
         except Exception as e:
-            wait("Conversion failed")
+            waitcontinue("Conversion failed")
             return (1, str(e))

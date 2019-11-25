@@ -3,12 +3,13 @@ import os, os.path, logging, re
 
 from PIL import Image
 
+from genutility.filesystem import fileextensions
 from plug import Filetypes
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-@Filetypes.plugin(["jpg", "jpeg", "bmp", "png", "gif", "tga", "tiff", "tif"])
+@Filetypes.plugin(fileextensions.images)
 class Images(object):
     def __init__(self):
         pass

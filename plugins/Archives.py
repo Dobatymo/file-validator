@@ -1,14 +1,17 @@
 from __future__ import unicode_literals
 import sys, logging, subprocess
-from .rar import Rar, RarError # use 'pip install rarfile' module instead ?
 
 from plug import Filetypes
 from genutility.twothree.filesystem import tofs, fromfs
+from genutility.fileformats.rar import Rar, RarError # use 'pip install rarfile' module instead ?
+from genutility.filesystem import fileextensions
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-@Filetypes.plugin(["zip", "cbz", "7z", "gz", "bz2", "z", "tar", "tgz", "tbz", "rar", "cbr"])
+extensions = fileextensions.archives + fileextensions.image_archives + fileextensions.compressed
+
+@Filetypes.plugin(extensions)
 class Archives(object):
 
     def __init__(self, UnRarExecutable, SevenZipExecutable):
@@ -17,7 +20,7 @@ class Archives(object):
 
     def validate(self, path, ext):
         foundexe = True
-        if ext in ("zip", "cbz", "7z", "gz", "bz2", "z", "tar", "tgz", "tbz"):
+        if ext in ("zip", "cbz", "cb7", "cbt", "cba", "7z", "gz", "bz2", "xz", "z", "lzma", "tar", "tgz", "tbz", "cab"):
             Executable = self.SevenZipExecutable
             args = "t -p-"
         elif ext in ("rar", "cbr"):
@@ -30,6 +33,9 @@ class Archives(object):
                 return (0, "")
             except RarError as e:
                 return (1, "{} [{}] [{}]: {}".format(str(e), e.cmd, e.returncode, e.output))
+        elif ext in {"wim"}:
+            # "C:\Program Files (x86)\Windows Kits\10\Tools\bin\i386\imagex.exe" /info "C:\Windows\Containers\WindowsDefenderApplicationGuard.wim" /check
+            foundexe = False
         else:
             foundexe = False
 

@@ -10,7 +10,7 @@ logger.addHandler(logging.NullHandler())
 @Filetypes.plugin(["flac"])
 class FLAC(object):
 
-    def __init__(self, executable, warnings_as_errors = True):
+    def __init__(self, executable, warnings_as_errors=True):
         self.executable = executable
         self.wae = warnings_as_errors
     
