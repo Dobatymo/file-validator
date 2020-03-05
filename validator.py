@@ -1,9 +1,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from future.utils import viewitems
+
 import os, os.path, logging
 from datetime import datetime
 
-from genutility.twothree.filesystem import tofs, fromfs, sbs
+from genutility.twothree.filesystem import fromfs, sbs
 from genutility.json import read_json
 
 from plug import Filetypes
@@ -19,7 +21,7 @@ def scandir(top, rec, followlinks=False):
             yield os.path.join(dir, d)
 
     walker = os.walk(top, followlinks=followlinks)
-    
+
     dirpath, __, filenames = next(walker)
     for path in joiner(dirpath, filenames):
         yield path
@@ -29,22 +31,29 @@ def scandir(top, rec, followlinks=False):
         for path in joiner(dirpath, filenames):
             yield path
 
-def main(DIRS, report_dir, xslfile, recursive):
+def main(paths, report_dir, xslfile, recursive, verbose=False, ignore=None):
+    # type: (Sequence[str], str, str, bool, bool, Optional[set]) -> None
 
-    logging.basicConfig(level=logging.DEBUG, format="%(levelname)s\t%(name)s\t%(funcName)s\t%(message)s")
+    if verbose:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+
+    logging.getLogger("PIL.PngImagePlugin").setLevel(logging.WARNING)
 
     for name in plugins.__all__:
         __import__("plugins." + name)
 
-    for class_, extensions in Filetypes.PLUGINS.iteritems():
-        logger.info("Loaded Filetype plugin {} for: {}".format(class_.__name__, ", ".join(extensions)))
+    for class_, extensions in viewitems(Filetypes.PLUGINS):
+        logger.info("Loaded Filetype plugin %s for: %s", class_.__name__, ", ".join(extensions))
 
     validators = {}
-    no_validators = set()
+    no_validators = ignore or set()
 
-    with xmlreport(os.path.join(report_dir, "report_{}.xml".format(datetime.now().isoformat(sbs("_"))).replace(":", ".")), xslfile) as report:
+    filename = "report_{}.xml".format(datetime.now().isoformat(sbs("_")).replace(":", "."))
+    with xmlreport(os.path.join(report_dir, filename), xslfile) as report:
 
-        for dir in DIRS:
+        for dir in paths:
             for path in scandir(dir, rec=recursive):
                 logger.debug(path)
                 ext = os.path.splitext(path)[1][1:].lower()
@@ -56,46 +65,52 @@ def main(DIRS, report_dir, xslfile, recursive):
                 try:
                     validator = validators[ext]
                 except KeyError:
-                    for class_, extensions in Filetypes.PLUGINS.iteritems():
+                    for class_, extensions in viewitems(Filetypes.PLUGINS):
                         if ext in extensions:
                             try:
-                                config = read_json("config/{}.json".format(class_.__name__), "r", encoding="utf-8")
+                                config = read_json("config/{}.json".format(class_.__name__))
                             except IOError:
-                                logger.info("Could not find config for '{}'".format(class_.__name__))
+                                logger.info("Could not find config for '%s'", class_.__name__)
                                 config = {}
                             except ValueError:
-                                logger.exception("Could not load config for '{}'".format(class_.__name__))
+                                logger.exception("Could not load config for '%s'", class_.__name__)
                                 config = {}
                             try:
-                                validators[ext] = validator = class_(**config)
+                                validator = validators[ext] = class_(**config)
                             except TypeError:
-                                logger.error("Cannot use '{}' without config".format(class_.__name__))
+                                logger.error("Cannot use '%s' without config", class_.__name__)
                 if not validator:
                     no_validators.add(ext)
-                    logger.info("No validator found for file extension '{}'".format(ext))
+                    logger.info("No validator found for file extension '%s'", ext)
                     continue
+
                 try:
                     code, message = validator.validate(os.path.abspath(path), ext)
                     report.write(path, str(code), message)
                     report.newline()
                 except Exception as e:
-                    logger.exception("Validating '{}' failed".format(path))
+                    logger.exception("Validating '%s' failed", path)
 
 if __name__ == "__main__":
     import argparse
 
+    # from genutility.os import get_appdata_dir
+    from genutility.compat.os import makedirs
+
     parser = argparse.ArgumentParser(description="FileValidator", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    #parser.add_argument("-d", "--reportdir", dest="reportdir", type=fromfs, default=os.path.join(os.getenv("APPDATA"), "pyFileValidator"), help="set output directory for reports")
+    #parser.add_argument("-d", "--reportdir", dest="reportdir", type=fromfs, default=os.path.join(get_appdata_dir(), "pyFileValidator"), help="set output directory for reports")
     parser.add_argument("-d", "--reportdir", dest="reportdir", type=fromfs, default="./reports", help="set output directory for reports")
     parser.add_argument("-x", "--xsl", dest="xslfile", type=fromfs, default="report.xsl", help="set xsl style sheet file")
-    parser.add_argument("-r", "--recursive", dest="recursive", type=bool, default=True, help="scan directories recursively")
-    parser.add_argument("DIRECTORY", nargs='+', type=fromfs, help="directories to create report for")
+    parser.add_argument("-r", "--recursive", dest="recursive", action="store_true", help="scan directories recursively")
+    parser.add_argument("-v", "--verbose", action="store_true", help="output debug info")
+    parser.add_argument("-i", "--ignore", nargs='+', default=[], help="extensions to ignore")
+    parser.add_argument("paths", metavar="DIRECTORY", nargs='+', type=fromfs, help="directories to create report for")
     args = parser.parse_args()
 
     if not os.path.isdir(args.reportdir):
         try:
-            os.mkdir(args.reportdir)
+            makedirs(args.reportdir)
         except OSError:
             exit("Error: '{}' is not a valid directory.".format(args.reportdir))
 
-    main(args.DIRECTORY, args.reportdir, args.xslfile, args.recursive)
+    main(args.paths, args.reportdir, args.xslfile, args.recursive, args.verbose, set(args.ignore))

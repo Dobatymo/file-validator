@@ -1,5 +1,6 @@
-from __future__ import unicode_literals
-import sys, subprocess, logging
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import sys, subprocess, logging, os.path
 
 from plug import Filetypes
 from genutility.twothree.filesystem import tofs
@@ -13,6 +14,8 @@ class Videos(object):
 
     def __init__(self, ffmpeg):
         self.ffmpeg = ffmpeg
+
+        assert os.path.isfile(ffmpeg)
 
     def validate(self, path, ext):
         cmd = "{path} -v error -nostats -i \"{filename}\" -f null -".format(path=self.ffmpeg, filename=path)

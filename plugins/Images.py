@@ -11,6 +11,7 @@ logger.addHandler(logging.NullHandler())
 
 @Filetypes.plugin(fileextensions.images)
 class Images(object):
+
     def __init__(self):
         pass
 
