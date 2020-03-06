@@ -1,8 +1,10 @@
 from __future__ import unicode_literals
+
 import sys, logging, subprocess
+from pathlib import Path
 
 from plug import Filetypes
-from genutility.twothree.filesystem import tofs, fromfs
+from genutility.twothree.filesystem import tofs
 from genutility.fileformats.rar import Rar, RarError # use 'pip install rarfile' module instead ?
 from genutility.filesystem import fileextensions
 
@@ -15,19 +17,19 @@ extensions = fileextensions.archives + fileextensions.image_archives + fileexten
 class Archives(object):
 
     def __init__(self, UnRarExecutable, SevenZipExecutable):
-        self.UnRarExecutable = UnRarExecutable
-        self.SevenZipExecutable = SevenZipExecutable
+        self.UnRarExecutable = Path(UnRarExecutable)
+        self.SevenZipExecutable = Path(SevenZipExecutable)
 
     def validate(self, path, ext):
         foundexe = True
         if ext in ("zip", "cbz", "cb7", "cbt", "cba", "7z", "gz", "bz2", "xz", "z", "lzma", "tar", "tgz", "tbz", "cab"):
-            Executable = self.SevenZipExecutable
+            executable = self.SevenZipExecutable
             args = "t -p-"
         elif ext in ("rar", "cbr"):
-            Executable = self.UnRarExecutable
+            executable = self.UnRarExecutable
             #args = u"t -p-"
             foundexe = False
-            r = Rar(path, Executable)
+            r = Rar(path, executable)
             try:
                 r.test()
                 return (0, "")
@@ -41,7 +43,7 @@ class Archives(object):
 
         if foundexe:
             try:
-                cmd = '"{}" {} "{}"'.format(Executable, args, path)
+                cmd = '"{}" {} "{}"'.format(executable, args, path)
                 ret = subprocess.check_output(tofs(cmd))
                 return (0, "")
             except UnicodeEncodeError as e:
