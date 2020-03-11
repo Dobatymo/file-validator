@@ -13,7 +13,7 @@
         <tr>
         <td><xsl:value-of select="@path" /></td>
         <td><xsl:value-of select="@code" /></td>
-        <td><pre><xsl:value-of select="." /></pre></td>
+        <td><pre><xsl:value-of select="substring(., 1, 10000)" /></pre></td>
         </tr>
         </xsl:if></xsl:for-each>
         </table>
