@@ -18,9 +18,9 @@ class Videos(object):
         assert os.path.isfile(ffmpeg)
 
     def validate(self, path, ext):
-        cmd = "{path} -v error -nostats -i \"{filename}\" -f null -".format(path=self.ffmpeg, filename=path)
+        cmd = [self.ffmpeg, "-v", "error", "-nostats", "-i", path, "-f", "null", "-"]
         try:
-            output = subprocess.check_output(tofs(cmd), stderr=subprocess.STDOUT).decode(sys.stdout.encoding)
+            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode(sys.stdout.encoding)
             if output:
                 return (1, output)
             else:
