@@ -5,6 +5,7 @@ from future.utils import viewitems
 import os, os.path, logging
 from datetime import datetime
 
+from genutility.compat import FileNotFoundError
 from genutility.twothree.filesystem import fromfs, sbs
 from genutility.json import read_json
 
@@ -69,7 +70,7 @@ def main(paths, report_dir, xslfile, recursive, verbose=False, ignore=None):
                         if ext in extensions:
                             try:
                                 config = read_json("config/{}.json".format(class_.__name__))
-                            except IOError:
+                            except FileNotFoundError:
                                 logger.info("Could not find config for '%s'", class_.__name__)
                                 config = {}
                             except ValueError:
@@ -88,6 +89,9 @@ def main(paths, report_dir, xslfile, recursive, verbose=False, ignore=None):
                     code, message = validator.validate(os.path.abspath(path), ext)
                     report.write(path, str(code), message)
                     report.newline()
+                except KeyboardInterrupt:
+                    logger.warning("Validating '%s' interrupted", path)
+                    raise
                 except Exception as e:
                     logger.exception("Validating '%s' failed", path)
 
@@ -113,4 +117,4 @@ if __name__ == "__main__":
         except OSError:
             exit("Error: '{}' is not a valid directory.".format(args.reportdir))
 
-    main(args.paths, args.reportdir, args.xslfile, args.recursive, args.verbose, set(args.ignore))
+    main(args.paths, args.reportdir, args.xslfile, args.recursive, args.verbose, set(ext.lower() for ext in args.ignore))

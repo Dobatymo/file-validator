@@ -1,7 +1,7 @@
-from __future__ import unicode_literals
-from plug import Filetypes
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from xml.etree.ElementTree import parse, ParseError
+from plug import Filetypes
 
 @Filetypes.plugin(["xml", "xsl"])
 class XML(object):

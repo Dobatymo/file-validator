@@ -11,7 +11,7 @@ from genutility.filesystem import fileextensions
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-extensions = fileextensions.archives + fileextensions.image_archives + fileextensions.compressed
+extensions = set(fileextensions.archives + fileextensions.image_archives + fileextensions.compressed) - set(["zip", "cbz"]) # zip handled by zip.py
 
 @Filetypes.plugin(extensions)
 class Archives(object):
@@ -22,7 +22,7 @@ class Archives(object):
 
     def validate(self, path, ext):
         foundexe = True
-        if ext in ("zip", "cbz", "cb7", "cbt", "cba", "7z", "gz", "bz2", "xz", "z", "lzma", "tar", "tgz", "tbz", "cab"):
+        if ext in ("cb7", "cbt", "cba", "7z", "gz", "bz2", "xz", "z", "lzma", "tar", "tgz", "tbz", "cab"):
             executable = self.SevenZipExecutable
             args = "t -p-"
         elif ext in ("rar", "cbr"):

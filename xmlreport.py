@@ -38,6 +38,9 @@ class xmlreport(object):
         #self.fp.write("\n")
         self.xmlgen.characters("\n")
 
+    def flush(self):
+        self.fp.flush()
+
     def close(self):
         self.xmlgen.endElementNS((None, "report"), "report")
         self.xmlgen.endDocument()

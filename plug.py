@@ -4,5 +4,5 @@ class Filetypes(object):
     @classmethod
     def plugin(cls, extensions):
         def register(plugin):
-            cls.PLUGINS[plugin] = list(x.lower() for x in extensions)
+            cls.PLUGINS[plugin] = set(x.lower() for x in extensions)
         return register
