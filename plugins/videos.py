@@ -15,7 +15,8 @@ class Videos(object):
     def __init__(self, ffmpeg):
         self.ffmpeg = ffmpeg
 
-        assert os.path.isfile(ffmpeg)
+        if not os.path.isfile(ffmpeg):
+            raise RuntimeError("Cannot find ffmpeg executable")
 
     def validate(self, path, ext):
         cmd = [self.ffmpeg, "-v", "error", "-nostats", "-i", path, "-f", "null", "-"]
