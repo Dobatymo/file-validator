@@ -1,2 +1,2 @@
 future
-genutility[json]
+genutility[json]>=0.0.41
