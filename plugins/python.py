@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from plug import Filetypes
 
+
 @Filetypes.plugin(["py", "pyw"])
 class Python(object):
     def __init__(self):

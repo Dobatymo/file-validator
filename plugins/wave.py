@@ -1,8 +1,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import wave
+
 from genutility.iter import consume
+
 from plug import Filetypes
+
 
 def iter_wave(wr, chunksize=10000):
 	frames = wr.getnframes()

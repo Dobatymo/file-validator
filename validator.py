@@ -12,9 +12,9 @@ from genutility.filesystem import entrysuffix, scandir_rec
 from genutility.json import read_json
 from genutility.twothree.filesystem import sbs
 
+import plugins
 from plug import Filetypes
 from xmlreport import XmlReport, load_report
-import plugins
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -113,11 +113,13 @@ def validate_paths(paths, report_dir, xslfile, resumefile=None, recursive=False,
 
 from gooey import Gooey
 
-@Gooey
+
+#@Gooey
 def main():
 
-	from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-	from genutility.args import is_file, out_dir, lowercase, is_dir
+	from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+
+	from genutility.args import is_dir, is_file, lowercase, out_dir
 
 	parser = ArgumentParser(description="FileValidator", formatter_class=ArgumentDefaultsHelpFormatter)
 	parser.add_argument("-d", "--reportdir", type=out_dir, default=DEFAULT_REPORTS_DIR, help="set output directory for reports")

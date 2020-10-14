@@ -1,9 +1,13 @@
 from __future__ import unicode_literals
-import os, os.path, logging, re
 
-from PIL import Image
+import logging
+import os
+import os.path
+import re
 
 from genutility.filesystem import fileextensions
+from PIL import Image
+
 from plug import Filetypes
 
 logger = logging.getLogger(__name__)

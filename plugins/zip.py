@@ -1,12 +1,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from zipfile import ZipFile
+
 try:
 	from zipfile import BadZipFile
 except ImportError:
 	from zipfile import BadZipfile as BadZipFile
 
 from plug import Filetypes
+
 
 @Filetypes.plugin(["zip", "cbz"])
 class Zip(object):

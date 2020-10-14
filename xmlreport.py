@@ -1,9 +1,10 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from io import open
+from xml.etree import ElementTree
 from xml.sax.saxutils import XMLGenerator
 from xml.sax.xmlreader import AttributesNSImpl
-from xml.etree import ElementTree
+
 
 def load_report(path):
 	# type: (str, ) -> dict

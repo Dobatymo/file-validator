@@ -1,12 +1,15 @@
 from __future__ import unicode_literals
 
-import sys, logging, subprocess
+import logging
+import subprocess
+import sys
 from pathlib import Path
 
-from plug import Filetypes
-from genutility.twothree.filesystem import tofs
-from genutility.fileformats.rar import Rar, RarError # use 'pip install rarfile' module instead ?
+from genutility.fileformats.rar import Rar, RarError  # use 'pip install rarfile' module instead ?
 from genutility.filesystem import fileextensions
+from genutility.twothree.filesystem import tofs
+
+from plug import Filetypes
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

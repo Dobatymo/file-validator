@@ -1,8 +1,10 @@
 from __future__ import unicode_literals
+
+from bs4 import BeautifulSoup
+from genutility.file import read_file
+
 from plug import Filetypes
 
-from genutility.file import read_file
-from bs4 import BeautifulSoup
 
 @Filetypes.plugin(["htm", "html"])
 class HTML(object):

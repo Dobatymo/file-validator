@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
+
+from genutility.fileformats.srt import MalformedFile, SRTFile
+
 from plug import Filetypes
 
-from genutility.fileformats.srt import SRTFile, MalformedFile
 
 @Filetypes.plugin(["srt"])
 class SRT(object):

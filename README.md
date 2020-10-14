@@ -1,4 +1,4 @@
-#FileValidate
+# file-validate
 
 ## What is it?
 
@@ -6,14 +6,16 @@ A commandline program to generate xml reports about the validity of files. It sc
 
 ## How do I use it?
 
-Have python installed and execute 'validator.py --help'
+- Install Python
+- `pip install -r requirements.txt`
+- `validator.py --help`
 
 ## Dependencies
 
 * main program:
     * none
 * plugins:
-    * Archives: unrar and 7z executable, set path in plugin. Needs rar.py from https://github.com/Dobatymo/pyutils in path.
+    * Archives: unrar and 7z executable, set path in plugin
     * Images: Python Imaging Library (PIL)
     * PDF: python library 'pyPdf'
     * Videos: ffmpeg executable, set path in plugin

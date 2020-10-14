@@ -1,8 +1,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import warnings
+
 from PyPDF2 import PdfFileReader
+
 from plug import Filetypes
+
 
 @Filetypes.plugin(["pdf"])
 class PDF(object):

@@ -1,10 +1,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import sys, subprocess, logging, os.path
+import logging
+import os.path
+import subprocess
+import sys
+
+from genutility.filesystem import fileextensions
+from genutility.twothree.filesystem import tofs
 
 from plug import Filetypes
-from genutility.twothree.filesystem import tofs
-from genutility.filesystem import fileextensions
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

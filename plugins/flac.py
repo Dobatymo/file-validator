@@ -1,8 +1,12 @@
 from __future__ import unicode_literals
-import sys, logging, subprocess
+
+import logging
+import subprocess
+import sys
+
+from genutility.twothree.filesystem import tofs
 
 from plug import Filetypes
-from genutility.twothree.filesystem import tofs
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
