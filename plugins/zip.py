@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from typing import Tuple
 from zipfile import ZipFile
 
 try:
@@ -13,16 +14,18 @@ from plug import Filetypes
 @Filetypes.plugin(["zip", "cbz"])
 class Zip(object):
 
-    def __init__(self):
-        pass
+	def __init__(self):
+		pass
 
-    def validate(self, path, ext):
-        try:
-            with ZipFile(path, "r") as z:
-                z.testzip()
+	def validate(self, path, ext):
+		# type: (str, str) -> Tuple[int, str]
 
-            return (0, "")
-        except BadZipFile as e:
-            return (1, str(e))
-        except Exception as e:
-            return (1, str(e))
+		try:
+			with ZipFile(path, "r") as z:
+				z.testzip()
+
+			return (0, "")
+		except BadZipFile as e:
+			return (1, str(e))
+		except Exception as e:
+			return (1, str(e))

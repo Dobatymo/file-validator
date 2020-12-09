@@ -1,4 +1,6 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import generator_stop
+
+from typing import Tuple
 
 from genutility.json import read_json
 
@@ -11,6 +13,8 @@ class JSON(object):
 		pass
 
 	def validate(self, path, ext):
+		# type: (str, str) -> Tuple[int, str]
+
 		try:
 			read_json(path)
 			return (0, "")

@@ -1,17 +1,16 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import generator_stop
 
 import logging
 import os.path
 import subprocess
 import sys
+from typing import Tuple
 
 from genutility.filesystem import fileextensions
-from genutility.twothree.filesystem import tofs
 
 from plug import Filetypes
 
 logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
 
 @Filetypes.plugin(fileextensions.video)
 class Videos(object):
@@ -23,6 +22,8 @@ class Videos(object):
             raise RuntimeError("Cannot find ffmpeg executable")
 
     def validate(self, path, ext):
+		# type: (str, str) -> Tuple[int, str]
+
         cmd = [self.ffmpeg, "-v", "error", "-nostats", "-i", path, "-f", "null", "-"]
         try:
             output = subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode(sys.stdout.encoding)

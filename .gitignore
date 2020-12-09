@@ -1,19 +1,9 @@
 *.bak
 
-# Validator
-temp/
-reports/*.xml
-validate.bat
-
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
 
-# Distribution / packaging
-build/
-dist/
-*.egg-info/
-
-# Translations
-*.mo
-*.pot
+# Validator
+temp/
+reports/*.xml

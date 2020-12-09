@@ -1,41 +1,30 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from future.utils import viewitems
-
 import logging
-from datetime import datetime
+from os import fspath
+from pathlib import Path
+from typing import Dict, Optional, Sequence
 
-from genutility.compat import FileNotFoundError
-from genutility.compat.os import fspath
-from genutility.compat.pathlib import Path
-from genutility.filesystem import entrysuffix, scandir_rec
+from genutility.datetime import now
+from genutility.filesystem import MyDirEntry, entrysuffix, scandir_rec
 from genutility.json import read_json
-from genutility.twothree.filesystem import sbs
 
 import plugins
-from plug import Filetypes
+from plug import Filetypes, Plugin
 from xmlreport import XmlReport, load_report
 
 logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
 
 DEFAULT_REPORTS_DIR = Path("./reports")
 DEFAULT_STYLE_SHEET = "report.xsl"
 
-def validate_paths(paths, report_dir, xslfile, resumefile=None, recursive=False, relative=False, verbose=False, ignore=None):
-	# type: (Sequence[str], str, str, Optional[str], bool, bool, Optional[set]) -> None
-
-	if verbose:
-		logging.basicConfig(level=logging.DEBUG)
-	else:
-		logging.basicConfig(level=logging.INFO)
-
-	logging.getLogger("PIL.PngImagePlugin").setLevel(logging.WARNING)
+def validate_paths(paths, report_dir, xslfile, resumefile=None, recursive=False, relative=False, ignore=None):
+	# type: (Sequence[str], Path, str, Optional[str], bool, bool, Optional[set]) -> None
 
 	for name in plugins.__all__:
 		__import__("plugins." + name)
 
-	for class_, extensions in viewitems(Filetypes.PLUGINS):
+	for class_, extensions in Filetypes.PLUGINS.items():
 		logger.info("Loaded Filetype plugin %s for: %s", class_.__name__, ", ".join(extensions))
 
 	if resumefile:
@@ -43,11 +32,11 @@ def validate_paths(paths, report_dir, xslfile, resumefile=None, recursive=False,
 	else:
 		resume_info = {}
 
-	validators = {}
+	validators = {}  # type: Dict[str, Plugin]
 	no_validators = ignore or set()
 
-	filename = "report_{}.xml".format(datetime.now().isoformat(sbs("_")).replace(":", "."))
-	with XmlReport(report_dir / filename, xslfile) as report:
+	filename = "report_{}.xml".format(now().isoformat("_").replace(":", "."))
+	with XmlReport(fspath(report_dir / filename), xslfile) as report:
 
 		for dir in paths:
 			for entry in scandir_rec(dir, dirs=False, rec=recursive, follow_symlinks=False, relative=relative):
@@ -56,6 +45,7 @@ def validate_paths(paths, report_dir, xslfile, resumefile=None, recursive=False,
 				ext = entrysuffix(entry).lower()[1:]
 
 				if relative:
+					assert isinstance(entry, MyDirEntry)
 					outpath = entry.relpath
 				else:
 					outpath = fspath(entry)
@@ -80,7 +70,7 @@ def validate_paths(paths, report_dir, xslfile, resumefile=None, recursive=False,
 				try:
 					validator = validators[ext]
 				except KeyError:
-					for class_, extensions in viewitems(Filetypes.PLUGINS):
+					for class_, extensions in Filetypes.PLUGINS.items():
 						if ext in extensions:
 							try:
 								config = read_json("config/{}.json".format(class_.__name__))
@@ -106,14 +96,12 @@ def validate_paths(paths, report_dir, xslfile, resumefile=None, recursive=False,
 				except KeyboardInterrupt:
 					logger.warning("Validating '%s' interrupted", fspath(entry))
 					raise
-				except Exception as e:
+				except Exception:
 					logger.exception("Validating '%s' failed", fspath(entry))
 				else:
 					report.write(outpath, str(code), message)
 
-from gooey import Gooey
-
-
+#from gooey import Gooey
 #@Gooey
 def main():
 
@@ -131,6 +119,11 @@ def main():
 	parser.add_argument("--resume", type=is_file, help="Resume validation using a previous XML report")
 	parser.add_argument("paths", metavar="DIRECTORY", nargs='+', type=is_dir, help="directories to create report for")
 	args = parser.parse_args()
+
+	if args.verbose:
+		logging.basicConfig(level=logging.DEBUG)
+	else:
+		logging.basicConfig(level=logging.INFO)
 
 	validate_paths(args.paths, args.reportdir, args.xslfile, args.resume, args.recursive, args.relative, args.verbose, set(args.ignore))
 

@@ -1,6 +1,7 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import generator_stop
 
 import wave
+from typing import Tuple
 
 from genutility.iter import consume
 
@@ -21,6 +22,8 @@ class WAVE(object):
 		pass
 
 	def validate(self, path, ext):
+		# type: (str, str) -> Tuple[int, str]
+
 		try:
 			with wave.open(path, "rb") as wr:
 				consume(iter_wave(wr))

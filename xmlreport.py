@@ -1,6 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from io import open
 from xml.etree import ElementTree
 from xml.sax.saxutils import XMLGenerator
 from xml.sax.xmlreader import AttributesNSImpl
@@ -27,8 +26,8 @@ class XmlReport(object):
 	def __init__(self, filename, xslfile):
 		# type: (str, str) -> None
 
-		self.fp = open(filename, "wb")
-		self.xmlgen = XMLGenerator(self.fp, "utf-8")
+		self.fp = open(filename, "w", encoding="utf-8")
+		self.xmlgen = XMLGenerator(self.fp)
 		self.xmlgen.startDocument()
 		self.xmlgen.processingInstruction("xml-stylesheet", 'type="text/xsl" href="{}"'.format(xslfile))
 		attrs = AttributesNSImpl({}, {})
@@ -45,12 +44,12 @@ class XmlReport(object):
 		# type: (str, str, str) -> None
 
 		attr_vals = {
-			(None, "code"): code,
-			(None, "path"): path
+			("", "code"): code,
+			("", "path"): path
 		}
 		attr_qnames = {
-			(None, "code"): "code",
-			(None, "path"): "path"
+			("", "code"): "code",
+			("", "path"): "path"
 		}
 		attrs = AttributesNSImpl(attr_vals, attr_qnames)
 		self.xmlgen.startElementNS((None, "file"), "file", attrs)

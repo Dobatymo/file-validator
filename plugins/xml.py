@@ -1,5 +1,6 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import generator_stop
 
+from typing import Tuple
 from xml.etree.ElementTree import ParseError, parse
 
 from plug import Filetypes
@@ -11,8 +12,10 @@ class XML(object):
 		pass
 
 	def validate(self, path, ext):
+		# type: (str, str) -> Tuple[int, str]
+
 		try:
-			et = parse(path)
+			parse(path)
 			return (0, "")
 		except ParseError as e:
 			return (1, str(e))
