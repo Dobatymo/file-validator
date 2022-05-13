@@ -1,5 +1,3 @@
-from __future__ import generator_stop
-
 import logging
 import os.path
 import subprocess
@@ -12,9 +10,9 @@ from plug import Filetypes
 
 logger = logging.getLogger(__name__)
 
-@Filetypes.plugin(fileextensions.video)
-class Videos(object):
 
+@Filetypes.plugin(fileextensions.video)
+class Videos:
     def __init__(self, ffmpeg):
         self.ffmpeg = ffmpeg
 
@@ -22,7 +20,7 @@ class Videos(object):
             raise RuntimeError("Cannot find ffmpeg executable")
 
     def validate(self, path, ext):
-		# type: (str, str) -> Tuple[int, str]
+        # type: (str, str) -> Tuple[int, str]
 
         cmd = [self.ffmpeg, "-v", "error", "-nostats", "-i", path, "-f", "null", "-"]
         try:
@@ -32,7 +30,7 @@ class Videos(object):
             else:
                 return (0, "")
         except subprocess.CalledProcessError as e:
-            logger.error("ffmpeg failed for '{}'".format(path))
+            logger.error(f"ffmpeg failed for '{path}'")
             return (1, e.output.decode(sys.stdout.encoding))
-        #except OSError:
+        # except OSError:
         #    logger.error("calling ffmpeg failed for '{}'".format(path))

@@ -1,5 +1,3 @@
-from __future__ import generator_stop
-
 import logging
 from typing import Tuple
 
@@ -10,17 +8,17 @@ from plug import Filetypes
 
 logger = logging.getLogger(__name__)
 
+
 @Filetypes.plugin(fileextensions.images)
-class Images(object):
+class Images:
+    def __init__(self):
+        logging.getLogger("PIL.PngImagePlugin").setLevel(logging.WARNING)
 
-	def __init__(self):
-		logging.getLogger("PIL.PngImagePlugin").setLevel(logging.WARNING)
+    def validate(self, path, ext):
+        # type: (str, str) -> Tuple[int, str]
 
-	def validate(self, path, ext):
-		# type: (str, str) -> Tuple[int, str]
-
-		try:
-			Image.open(path).save("temp/validate_images_temp.png") #use .verify()
-			return (0, "")
-		except Exception as e:
-			return (1, str(e))
+        try:
+            Image.open(path).save("temp/validate_images_temp.png")  # use .verify()
+            return (0, "")
+        except Exception as e:
+            return (1, str(e))
