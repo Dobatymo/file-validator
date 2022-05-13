@@ -14,8 +14,7 @@ class Images:
     def __init__(self):
         logging.getLogger("PIL.PngImagePlugin").setLevel(logging.WARNING)
 
-    def validate(self, path, ext):
-        # type: (str, str) -> Tuple[int, str]
+    def validate(self, path: str, ext: str) -> Tuple[int, str]:
 
         try:
             Image.open(path).save("temp/validate_images_temp.png")  # use .verify()

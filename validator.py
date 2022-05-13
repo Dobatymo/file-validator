@@ -18,15 +18,14 @@ DEFAULT_STYLE_SHEET = "report.xsl"
 
 
 def validate_paths(
-    paths,
-    report_dir,
-    xslfile,
-    resumefile=None,
-    recursive=False,
-    relative=False,
-    ignore=None,
-):
-    # type: (Sequence[str], Path, str, Optional[str], bool, bool, Optional[set]) -> None
+    paths: Sequence[str],
+    report_dir: Path,
+    xslfile: str,
+    resumefile: Optional[str] = None,
+    recursive: bool = False,
+    relative: bool = False,
+    ignore: Optional[set] = None,
+) -> None:
 
     for name in plugins.__all__:
         __import__("plugins." + name)
@@ -39,7 +38,7 @@ def validate_paths(
     else:
         resume_info = {}
 
-    validators = {}  # type: Dict[str, Plugin]
+    validators: Dict[str, Plugin] = {}
     no_validators = ignore or set()
 
     filename = "report_{}.xml".format(now().isoformat("_").replace(":", "."))

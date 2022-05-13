@@ -12,8 +12,7 @@ class TXT:
         """Constructor is called once per program run."""
         pass
 
-    def validate(self, path, ext):
-        # type: (str, str) -> Tuple[int, str]
+    def validate(self, path: str, ext: str) -> Tuple[int, str]:
 
         """validate() is called for every file
         path: complete/path/to/file.exe

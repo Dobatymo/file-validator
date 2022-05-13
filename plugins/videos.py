@@ -19,8 +19,7 @@ class Videos:
         if not os.path.isfile(ffmpeg):
             raise RuntimeError("Cannot find ffmpeg executable")
 
-    def validate(self, path, ext):
-        # type: (str, str) -> Tuple[int, str]
+    def validate(self, path: str, ext: str) -> Tuple[int, str]:
 
         cmd = [self.ffmpeg, "-v", "error", "-nostats", "-i", path, "-f", "null", "-"]
         try:

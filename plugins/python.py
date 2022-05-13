@@ -8,8 +8,7 @@ class Python:
     def __init__(self):
         pass
 
-    def validate(self, path, ext):
-        # type: (str, str) -> Tuple[int, str]
+    def validate(self, path: str, ext: str) -> Tuple[int, str]:
 
         try:
             with open(path, "rb") as fr:

@@ -11,8 +11,7 @@ class PDF:
     def __init__(self):
         pass
 
-    def validate(self, path, ext, strict=True):
-        # type: (str, str, bool) -> Tuple[int, str]
+    def validate(self, path: str, ext: str, strict: bool = True) -> Tuple[int, str]:
 
         try:
             with open(path, "rb") as fr:

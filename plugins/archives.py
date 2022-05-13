@@ -19,14 +19,12 @@ extensions = set(fileextensions.archives + fileextensions.image_archives + filee
 
 @Filetypes.plugin(extensions)
 class Archives:
-    def __init__(self, UnRarExecutable, SevenZipExecutable):
-        # type: (str, str) -> None
+    def __init__(self, UnRarExecutable: str, SevenZipExecutable: str) -> None:
 
         self.UnRarExecutable = Path(UnRarExecutable)
         self.SevenZipExecutable = Path(SevenZipExecutable)
 
-    def validate(self, path, ext):
-        # type: (str, str) -> Tuple[int, str]
+    def validate(self, path: str, ext: str) -> Tuple[int, str]:
 
         foundexe = True
         if ext in (

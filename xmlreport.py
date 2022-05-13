@@ -1,10 +1,10 @@
+from typing import Dict, Tuple
 from xml.etree import ElementTree
 from xml.sax.saxutils import XMLGenerator
 from xml.sax.xmlreader import AttributesNSImpl
 
 
-def load_report(path):
-    # type: (str, ) -> dict
+def load_report(path: str) -> Dict[str, Tuple[int, str]]:
 
     ret = dict()
 
@@ -21,8 +21,7 @@ def load_report(path):
 
 
 class XmlReport:
-    def __init__(self, filename, xslfile):
-        # type: (str, str) -> None
+    def __init__(self, filename: str, xslfile: str) -> None:
 
         self.fp = open(filename, "w", encoding="utf-8")
         self.xmlgen = XMLGenerator(self.fp)
@@ -38,8 +37,7 @@ class XmlReport:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def write(self, path, code, message):
-        # type: (str, str, str) -> None
+    def write(self, path: str, code: str, message: str) -> None:
 
         attr_vals = {("", "code"): code, ("", "path"): path}
         attr_qnames = {("", "code"): "code", ("", "path"): "path"}
@@ -49,13 +47,11 @@ class XmlReport:
         self.xmlgen.endElementNS((None, "file"), "file")
         self.xmlgen.characters("\n")
 
-    def flush(self):
-        # type: () -> None
+    def flush(self) -> None:
 
         self.fp.flush()
 
-    def close(self):
-        # type: () -> None
+    def close(self) -> None:
 
         self.xmlgen.endElementNS((None, "report"), "report")
         self.xmlgen.endDocument()

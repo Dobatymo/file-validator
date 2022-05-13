@@ -14,8 +14,7 @@ class FLAC:
         self.executable = executable
         self.wae = warnings_as_errors
 
-    def validate(self, path, ext):
-        # type: (str, str) -> Tuple[int, str]
+    def validate(self, path: str, ext: str) -> Tuple[int, str]:
 
         try:
             if self.wae:

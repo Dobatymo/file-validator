@@ -2,13 +2,12 @@ from typing import Dict, Protocol, Set, Tuple, Type
 
 
 class Plugin(Protocol):
-    def validate(self, path, ext):
-        # type: (str, str) -> Tuple[int, str]
+    def validate(self, path: str, ext: str) -> Tuple[int, str]:
         ...
 
 
 class Filetypes:
-    PLUGINS = {}  # type: Dict[Type, Set[str]]
+    PLUGINS: Dict[Type, Set[str]] = {}
 
     @classmethod
     def plugin(cls, extensions):
