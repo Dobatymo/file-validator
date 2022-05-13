@@ -6,14 +6,14 @@ A commandline program to generate xml reports about the validity of files. It sc
 
 ## How do I use it?
 
-- Install Python 3.8+
+- Install Python 3.7+
 - `py -m pip install -r requirements.txt`
 - `py -m pip install -r plugins/requirements.txt`
 - `py validator.py --help`
 
 ## CLI usage
-``` usage: validator.py [-h] [-d REPORTDIR] [-x XSLFILE] [-r] [-v] [-i EXT [EXT ...]] [--relative] [--resume RESUME]
-                    DIRECTORY [DIRECTORY ...]
+```
+usage: validator.py [-h] [-d REPORTDIR] [-x XSLFILE] [-r] [-v] [-i EXT [EXT ...]] [--relative] [--resume RESUME] DIRECTORY [DIRECTORY ...]
 
 FileValidator
 
