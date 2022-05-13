@@ -28,10 +28,11 @@ class XmlReport:
         self.xmlgen.startDocument()
         self.xmlgen.processingInstruction("xml-stylesheet", f'type="text/xsl" href="{xslfile}"')
         attrs = AttributesNSImpl({}, {})
+        self.xmlgen.characters("\n")
         self.xmlgen.startElementNS((None, "report"), "report", attrs)
         self.xmlgen.characters("\n")
 
-    def __enter__(self):
+    def __enter__(self) -> "XmlReport":
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):

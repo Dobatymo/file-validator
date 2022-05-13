@@ -165,7 +165,6 @@ def main():
         args.resume,
         args.recursive,
         args.relative,
-        args.verbose,
         set(args.ignore),
     )
 
