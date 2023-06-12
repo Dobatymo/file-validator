@@ -10,12 +10,11 @@ logger = logging.getLogger(__name__)
 
 @Filetypes.plugin(["flac"])
 class FLAC:
-    def __init__(self, executable, warnings_as_errors=True):
+    def __init__(self, executable: str, warnings_as_errors: bool = True) -> None:
         self.executable = executable
         self.wae = warnings_as_errors
 
     def validate(self, path: str, ext: str) -> Tuple[int, str]:
-
         try:
             if self.wae:
                 cmd = f'"{self.executable}" -t -s -w "{path}"'

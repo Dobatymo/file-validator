@@ -1,4 +1,5 @@
 beautifulsoup4 # bs4
 lxml # for parsing html
 Pillow>=8.1.1 # PIL
+pillow-heif
 PyPDF2

@@ -1,12 +1,12 @@
 import wave
-from typing import Tuple
+from typing import Iterator, Tuple
 
 from genutility.iter import consume
 
 from plug import Filetypes
 
 
-def iter_wave(wr, chunksize=10000):
+def iter_wave(wr: wave.Wave_read, chunksize: int = 10000) -> Iterator[bytes]:
     frames = wr.getnframes()
     while frames > 0:
         n = min(frames, chunksize)
@@ -16,11 +16,10 @@ def iter_wave(wr, chunksize=10000):
 
 @Filetypes.plugin(["wav"])
 class WAVE:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def validate(self, path: str, ext: str) -> Tuple[int, str]:
-
         try:
             with wave.open(path, "rb") as wr:
                 consume(iter_wave(wr))

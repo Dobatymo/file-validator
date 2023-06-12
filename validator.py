@@ -26,7 +26,6 @@ def validate_paths(
     relative: bool = False,
     ignore: Optional[set] = None,
 ) -> None:
-
     for name in plugins.__all__:
         __import__("plugins." + name)
 
@@ -43,10 +42,8 @@ def validate_paths(
 
     filename = "report_{}.xml".format(now().isoformat("_").replace(":", "."))
     with XmlReport(fspath(report_dir / filename), xslfile) as report:
-
         for dir in paths:
             for entry in scandir_rec(dir, dirs=False, rec=recursive, follow_symlinks=False, relative=relative):
-
                 logger.debug("Processing %s", fspath(entry))
                 ext = entrysuffix(entry).lower()[1:]
 
@@ -111,7 +108,6 @@ def validate_paths(
 # from gooey import Gooey
 # @Gooey
 def main():
-
     from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
     from genutility.args import is_dir, is_file, lowercase, out_dir

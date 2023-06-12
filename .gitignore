@@ -5,5 +5,4 @@ __pycache__/
 *.py[cod]
 
 # Validator
-temp/
 reports/*.xml

@@ -7,11 +7,10 @@ from plug import Filetypes
 
 @Filetypes.plugin(["json"])
 class JSON:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def validate(self, path: str, ext: str) -> Tuple[int, str]:
-
         try:
             read_json(path)
             return (0, "")

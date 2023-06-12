@@ -6,11 +6,10 @@ from plug import Filetypes
 
 @Filetypes.plugin(["ini"])
 class INI:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def validate(self, path: str, ext: str) -> Tuple[int, str]:
-
         try:
             config = configparser.ConfigParser()
             config.read(path)

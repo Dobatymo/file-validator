@@ -5,7 +5,6 @@ from xml.sax.xmlreader import AttributesNSImpl
 
 
 def load_report(path: str) -> Dict[str, Tuple[int, str]]:
-
     ret = dict()
 
     for event, elem in ElementTree.iterparse(path, events=["start"]):
@@ -22,7 +21,6 @@ def load_report(path: str) -> Dict[str, Tuple[int, str]]:
 
 class XmlReport:
     def __init__(self, filename: str, xslfile: str) -> None:
-
         self.fp = open(filename, "w", encoding="utf-8")
         self.xmlgen = XMLGenerator(self.fp)
         self.xmlgen.startDocument()
@@ -39,7 +37,6 @@ class XmlReport:
         self.close()
 
     def write(self, path: str, code: str, message: str) -> None:
-
         attr_vals = {("", "code"): code, ("", "path"): path}
         attr_qnames = {("", "code"): "code", ("", "path"): "path"}
         attrs = AttributesNSImpl(attr_vals, attr_qnames)
@@ -49,11 +46,9 @@ class XmlReport:
         self.xmlgen.characters("\n")
 
     def flush(self) -> None:
-
         self.fp.flush()
 
     def close(self) -> None:
-
         self.xmlgen.endElementNS((None, "report"), "report")
         self.xmlgen.endDocument()
         self.fp.close()

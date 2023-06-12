@@ -7,11 +7,10 @@ from plug import Filetypes
 
 @Filetypes.plugin(["srt"])
 class SRT:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def validate(self, path: str, ext: str) -> Tuple[int, str]:
-
         try:
             with SRTFile(path, "r") as fr:
                 for sub in fr:

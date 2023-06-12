@@ -1,21 +1,15 @@
 from typing import Tuple
-from zipfile import ZipFile
-
-try:
-    from zipfile import BadZipFile
-except ImportError:
-    from zipfile import BadZipfile as BadZipFile
+from zipfile import BadZipFile, ZipFile
 
 from plug import Filetypes
 
 
 @Filetypes.plugin(["zip", "cbz"])
 class Zip:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def validate(self, path: str, ext: str) -> Tuple[int, str]:
-
         try:
             with ZipFile(path, "r") as z:
                 z.testzip()

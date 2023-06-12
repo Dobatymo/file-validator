@@ -8,12 +8,11 @@ class TXT:
     """Trivial plugin to validate .txt files. It assumes all txt files are valid.
     ["txt"] determins the list of file extensions this plugin can handle."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Constructor is called once per program run."""
         pass
 
     def validate(self, path: str, ext: str) -> Tuple[int, str]:
-
         """validate() is called for every file
         path: complete/path/to/file.exe
         ext: just the extension of the file e.g. "exe"

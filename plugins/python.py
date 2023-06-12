@@ -5,11 +5,10 @@ from plug import Filetypes
 
 @Filetypes.plugin(["py", "pyw"])
 class Python:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def validate(self, path: str, ext: str) -> Tuple[int, str]:
-
         try:
             with open(path, "rb") as fr:
                 compile(fr.read(), "<file>", "exec")

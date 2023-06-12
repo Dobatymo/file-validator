@@ -13,14 +13,13 @@ logger = logging.getLogger(__name__)
 
 @Filetypes.plugin(fileextensions.video)
 class Videos:
-    def __init__(self, ffmpeg):
+    def __init__(self, ffmpeg: str) -> None:
         self.ffmpeg = ffmpeg
 
         if not os.path.isfile(ffmpeg):
             raise RuntimeError("Cannot find ffmpeg executable")
 
     def validate(self, path: str, ext: str) -> Tuple[int, str]:
-
         cmd = [self.ffmpeg, "-v", "error", "-nostats", "-i", path, "-f", "null", "-"]
         try:
             output = subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode(sys.stdout.encoding)

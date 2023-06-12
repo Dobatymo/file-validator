@@ -8,11 +8,10 @@ from plug import Filetypes
 
 @Filetypes.plugin(["htm", "html"])
 class HTML:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def validate(self, path: str, ext: str) -> Tuple[int, str]:
-
         try:
             data = read_file(path, "rb")
             BeautifulSoup(data, "lxml")
