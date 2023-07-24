@@ -1,10 +1,11 @@
 import logging
+import os
+import re
 import subprocess
-import sys
 from pathlib import Path
 from typing import Tuple
 
-from genutility.fileformats.rar import Rar, RarError  # use 'pip install rarfile' module instead ?
+from genutility.fileformats.rar import Rar, RarError, force_decode  # use 'pip install rarfile' module instead ?
 from genutility.filesystem import fileextensions
 
 from plug import Filetypes
@@ -46,12 +47,28 @@ class Archives:
             executable = self.UnRarExecutable
             # args = u"t -p-"
             foundexe = False
-            r = Rar(Path(path), executable)
+
+            p = Path(path)
+            m = re.match(r"^(.*)\.part([0-9]+)\.(rar|cbr)$", p.name)
+            if m:
+                name, part, ext = m.groups()
+                if int(part) != 1:
+                    filename = f"{name}.part{(len(part)-1)*'0'}1.{ext}"
+                    part_one = p.parent / filename
+                    if part_one.is_file():
+                        return (-2, "Skipping multi-part archive")
+                    else:
+                        return (1, "Multi-part archive missing initial part")
+
+            r = Rar(p, executable)
             try:
                 r.test()
                 return (0, "")
             except RarError as e:
-                return (1, f"{str(e)} [{e.cmd}] [{e.returncode}]: {e.output}")
+                return (1, f"Calling {executable} failed with error code [{e.returncode}]: {e.output}")
+            except Exception:
+                logger.exception("Calling `%s` failed", executable)
+                return (-1, f"Calling `{executable}` failed")
         elif ext in {"wim"}:
             # "C:\Program Files (x86)\Windows Kits\10\Tools\bin\i386\imagex.exe" /info "C:\Windows\Containers\WindowsDefenderApplicationGuard.wim" /check
             foundexe = False
@@ -61,17 +78,13 @@ class Archives:
         if foundexe:
             try:
                 cmd = f'"{executable}" {args} "{path}"'
-                subprocess.check_output(cmd)
+                subprocess.check_output(cmd, stderr=subprocess.STDOUT, cwd=os.getcwd())  # nosec
                 return (0, "")
-            except UnicodeEncodeError:
-                logger.error("UnicodeEncodeError for %s", path)
-                raise
             except subprocess.CalledProcessError as e:
-                try:
-                    output = e.output.decode(sys.stdout.encoding).replace("\n\n", "\n")
-                    return (1, f"{str(e)} [{e.cmd}] [{e.returncode}]: {output}")
-                except UnicodeDecodeError:
-                    logger.exception(path)
-                    raise
+                output = force_decode(e.output)
+                return (1, f"Calling {executable} failed with error code [{e.returncode}]: {output}")
+            except Exception:
+                logger.exception("Calling `%s` failed", cmd)
+                return (-1, f"Calling `{cmd}` failed")
 
         raise RuntimeError("Could not find archiver executable")

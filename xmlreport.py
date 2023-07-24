@@ -4,16 +4,18 @@ from xml.sax.saxutils import XMLGenerator
 from xml.sax.xmlreader import AttributesNSImpl
 
 
-def load_report(path: str) -> Dict[str, Tuple[int, str]]:
-    ret = dict()
+def load_report(path: str, fail_on_dups: bool = True) -> Dict[str, Tuple[int, str]]:
+    ret: Dict[str, Tuple[int, str]] = {}
 
     for event, elem in ElementTree.iterparse(path, events=["start"]):
         if elem.tag == "file":
             path = elem.attrib["path"]
             code = int(elem.attrib["code"])
-            message = elem.text
+            message = elem.text or ""
             elem.clear()
 
+            if fail_on_dups and path in ret:
+                raise ValueError(f"Duplicate path found: {path}")
             ret[path] = (code, message)
 
     return ret
@@ -22,7 +24,7 @@ def load_report(path: str) -> Dict[str, Tuple[int, str]]:
 class XmlReport:
     def __init__(self, filename: str, xslfile: str) -> None:
         self.fp = open(filename, "w", encoding="utf-8")
-        self.xmlgen = XMLGenerator(self.fp)
+        self.xmlgen = XMLGenerator(self.fp, encoding="utf-8")
         self.xmlgen.startDocument()
         self.xmlgen.processingInstruction("xml-stylesheet", f'type="text/xsl" href="{xslfile}"')
         attrs = AttributesNSImpl({}, {})

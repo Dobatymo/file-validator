@@ -1,1 +1,3 @@
-genutility[datetime, filesystem,json]>=0.0.101
+genutility[args,datetime,filesystem,json]>=0.0.101
+rich
+Send2Trash>=1.8.0
