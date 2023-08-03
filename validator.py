@@ -22,11 +22,25 @@ def scan(paths: Sequence[Path], recursive: bool, relative: bool):
     for path in paths:
         yield from scandir_rec(path, dirs=False, rec=recursive, follow_symlinks=False, relative=relative)
 
+class BaseOutput:
 
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, *args):
+        pass
+
+    def write(self, path: str, code: str, message: str) -> None:
+        raise NotImplementedError
+
+class Stdout(BaseOutput):
+
+    def write(self, path: str, code: str, message: str) -> None:
+        print(path, code, message[:100].replace("\n", "\t"))
+    
 def validate_paths(
     paths: Sequence[Path],
-    report_dir: Path,
-    xslfile: str,
+    output: BaseOutput,
     resumefile: Optional[str] = None,
     recursive: bool = False,
     relative: bool = False,
@@ -47,8 +61,7 @@ def validate_paths(
     validators: Dict[str, Plugin] = {}
     no_validators = ignore or set()
 
-    filename = "report_{}.xml".format(now().isoformat("_").replace(":", "."))
-    with XmlReport(fspath(report_dir / filename), xslfile) as report:
+    with output as report:
         for entry in track(scan(paths, recursive, relative)):
             logger.debug("Processing %s", fspath(entry))
             ext = entrysuffix(entry).lower()[1:]
@@ -165,6 +178,12 @@ def main():
         type=is_dir,
         help="directories to create report for",
     )
+    parser.add_argument(
+        "--out",
+        choices=("xml", "stdout"),
+        default="xml",
+        help="Output method. xml: write to xml file, stdout: simple format written to stdout",
+    )
     args = parser.parse_args()
 
     if args.verbose:
@@ -175,10 +194,17 @@ def main():
     only = set(args.only) if args.only else None
     ignore = set(args.ignore) if args.ignore else None
 
+    if args.out == "xml":
+        filename = "report_{}.xml".format(now().isoformat("_").replace(":", "."))
+        output = XmlReport(fspath(args.reportdir / filename), args.xslfile)
+    elif args.out == "stdout":
+        output = Stdout()
+    else:
+        parser.error("Invalid --out method")
+
     validate_paths(
         args.paths,
-        args.reportdir,
-        args.xslfile,
+        output,
         args.resume,
         args.recursive,
         args.relative,

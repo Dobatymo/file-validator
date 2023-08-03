@@ -13,4 +13,5 @@ __all__ = [
     "wave",
     "xml",
     "zip",
+    "sqlite",
 ]
