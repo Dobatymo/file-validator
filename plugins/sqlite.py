@@ -1,9 +1,10 @@
+import sqlite3
 from typing import Tuple
 
-import sqlite3
 from genutility.sqlite import to_uri
 
 from plug import Filetypes
+
 
 @Filetypes.plugin(["sqlite"])
 class Sqlite:
@@ -15,7 +16,7 @@ class Sqlite:
             uri = to_uri(path, mode="ro")
             con = sqlite3.connect(uri, uri=True)
             res = con.execute("PRAGMA quick_check;")
-            #res = con.execute("PRAGMA integrity_check;")
+            # res = con.execute("PRAGMA integrity_check;")
             message = "\n".join(row[0] for row in res.fetchall())
             if message == "ok":
                 return (0, "")

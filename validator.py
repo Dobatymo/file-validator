@@ -6,7 +6,8 @@ from typing import Dict, Optional, Sequence
 from genutility.datetime import now
 from genutility.filesystem import MyDirEntry, entrysuffix, scandir_rec
 from genutility.json import read_json
-from rich.progress import track
+from genutility.rich import Progress
+from rich.progress import Progress as RichProgress
 
 import plugins
 from plug import Filetypes, Plugin
@@ -22,22 +23,23 @@ def scan(paths: Sequence[Path], recursive: bool, relative: bool):
     for path in paths:
         yield from scandir_rec(path, dirs=False, rec=recursive, follow_symlinks=False, relative=relative)
 
-class BaseOutput:
 
+class BaseOutput:
     def __enter__(self):
         return self
-    
+
     def __exit__(self, *args):
         pass
 
     def write(self, path: str, code: str, message: str) -> None:
         raise NotImplementedError
 
-class Stdout(BaseOutput):
 
+class Stdout(BaseOutput):
     def write(self, path: str, code: str, message: str) -> None:
         print(path, code, message[:100].replace("\n", "\t"))
-    
+
+
 def validate_paths(
     paths: Sequence[Path],
     output: BaseOutput,
@@ -61,8 +63,9 @@ def validate_paths(
     validators: Dict[str, Plugin] = {}
     no_validators = ignore or set()
 
-    with output as report:
-        for entry in track(scan(paths, recursive, relative)):
+    with output as report, RichProgress() as progress:
+        p = Progress(progress)
+        for entry in p.track(scan(paths, recursive, relative)):
             logger.debug("Processing %s", fspath(entry))
             ext = entrysuffix(entry).lower()[1:]
 
