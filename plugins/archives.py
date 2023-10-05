@@ -81,7 +81,7 @@ class Archives:
                 subprocess.check_output(cmd, stderr=subprocess.STDOUT, cwd=os.getcwd())  # nosec
                 return (0, "")
             except subprocess.CalledProcessError as e:
-                output = force_decode(e.output)
+                output = force_decode(e.output).strip()
                 return (1, f"Calling {executable} failed with error code [{e.returncode}]: {output}")
             except Exception:
                 logger.exception("Calling `%s` failed", cmd)

@@ -1,7 +1,8 @@
 import logging
 import subprocess
-import sys
 from typing import Tuple
+
+from genutility.subprocess import force_decode
 
 from plug import Filetypes
 
@@ -23,4 +24,5 @@ class FLAC:
             subprocess.check_output(cmd, stderr=subprocess.STDOUT)
             return (0, "")
         except subprocess.CalledProcessError as e:
-            return (1, e.output.decode(sys.stdout.encoding))
+            output = force_decode(e.output).strip()
+            return (1, output)
