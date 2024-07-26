@@ -2,8 +2,7 @@ from typing import Dict, Protocol, Set, Tuple, Type
 
 
 class Plugin(Protocol):
-    def validate(self, path: str, ext: str) -> Tuple[int, str]:
-        ...
+    def validate(self, path: str, ext: str) -> Tuple[int, str]: ...
 
 
 class Filetypes:

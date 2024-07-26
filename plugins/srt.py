@@ -13,7 +13,7 @@ class SRT:
     def validate(self, path: str, ext: str) -> Tuple[int, str]:
         try:
             with SRTFile(path, "r") as fr:
-                for sub in fr:
+                for _sub in fr:
                     pass
             return (0, "")
         except AssertionError as e:

@@ -17,7 +17,7 @@ class PDF:
                 with warnings.catch_warnings(record=strict) as ws:
                     pdf = PdfFileReader(fr, strict=True, overwriteWarnings=False)
                     pdf.getDocumentInfo()
-                    for p in pdf.pages:
+                    for _p in pdf.pages:
                         pass
                     if ws:
                         return (1, "\n".join(str(w.message) for w in ws))

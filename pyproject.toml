@@ -1,7 +1,21 @@
 [tool.black]
 line-length = 120
 
+[tool.ruff]
+line-length = 120
+
+lint.extend-select = [
+  "B",
+  "I",
+]
+
 [tool.isort]
 profile = "black"
-src_paths = ["."]
 line_length = 120
+
+[tool.bandit]
+skips = [
+  "B101",
+  "B404",
+  "B603",
+]

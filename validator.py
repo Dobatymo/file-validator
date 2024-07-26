@@ -4,14 +4,18 @@ from pathlib import Path
 from typing import Dict, Optional, Sequence
 
 from genutility.datetime import now
-from genutility.filesystem import MyDirEntry, entrysuffix, scandir_rec
+from genutility.filesystem import MyDirEntry, entrysuffix, scandir_error_log_warning, scandir_rec
 from genutility.json import read_json
 from genutility.rich import Progress
+from rich.highlighter import NullHighlighter
+from rich.logging import RichHandler
+from rich.progress import BarColumn, MofNCompleteColumn
 from rich.progress import Progress as RichProgress
+from rich.progress import TextColumn, TimeElapsedColumn
 
 import plugins
 from plug import Filetypes, Plugin
-from xmlreport import XmlReport, load_report
+from report import JsonReport, ReportBase, Stdout, XmlReport, load_report
 
 logger = logging.getLogger(__name__)
 
@@ -21,28 +25,19 @@ DEFAULT_STYLE_SHEET = "report.xsl"
 
 def scan(paths: Sequence[Path], recursive: bool, relative: bool):
     for path in paths:
-        yield from scandir_rec(path, dirs=False, rec=recursive, follow_symlinks=False, relative=relative)
-
-
-class BaseOutput:
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args):
-        pass
-
-    def write(self, path: str, code: str, message: str) -> None:
-        raise NotImplementedError
-
-
-class Stdout(BaseOutput):
-    def write(self, path: str, code: str, message: str) -> None:
-        print(path, code, message[:100].replace("\n", "\t"))
+        yield from scandir_rec(
+            path,
+            dirs=False,
+            rec=recursive,
+            follow_symlinks=False,
+            relative=relative,
+            errorfunc=scandir_error_log_warning,
+        )
 
 
 def validate_paths(
     paths: Sequence[Path],
-    output: BaseOutput,
+    output: ReportBase,
     resumefile: Optional[str] = None,
     recursive: bool = False,
     relative: bool = False,
@@ -50,7 +45,10 @@ def validate_paths(
     ignore: Optional[set] = None,
 ) -> None:
     for name in plugins.__all__:
-        __import__("plugins." + name)
+        try:
+            __import__("plugins." + name)
+        except ModuleNotFoundError as e:
+            logger.error("Skipped plugin %s due to missing dependencies: %s", name, e)
 
     for class_, extensions in Filetypes.PLUGINS.items():
         logger.info("Loaded Filetype plugin %s for: %s", class_.__name__, ", ".join(extensions))
@@ -63,10 +61,17 @@ def validate_paths(
     validators: Dict[str, Plugin] = {}
     no_validators = ignore or set()
 
-    with output as report, RichProgress() as progress:
+    columns = [
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        TimeElapsedColumn(),
+    ]
+
+    with output as report, RichProgress(*columns) as progress:
         p = Progress(progress)
         for entry in p.track(scan(paths, recursive, relative)):
-            logger.debug("Processing %s", fspath(entry))
+            logger.debug("Processing `%s`", fspath(entry))
             ext = entrysuffix(entry).lower()[1:]
 
             if relative:
@@ -136,7 +141,7 @@ def validate_paths(
 def main():
     from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
-    from genutility.args import is_dir, is_file, lowercase, out_dir
+    from genutility.args import is_dir, is_file, out_dir, suffix_lower_raw
 
     parser = ArgumentParser(description="FileValidator", formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument(
@@ -159,7 +164,7 @@ def main():
         "--only",
         metavar="EXT",
         nargs="+",
-        type=lowercase,
+        type=suffix_lower_raw,
         default=None,
         help="only include these extensions",
     )
@@ -168,7 +173,7 @@ def main():
         "--ignore",
         metavar="EXT",
         nargs="+",
-        type=lowercase,
+        type=suffix_lower_raw,
         default=None,
         help="extensions to ignore",
     )
@@ -183,23 +188,33 @@ def main():
     )
     parser.add_argument(
         "--out",
-        choices=("xml", "stdout"),
+        choices=("xml", "json", "stdout"),
         default="xml",
-        help="Output method. xml: write to xml file, stdout: simple format written to stdout",
+        help="Output method. xml: write to xml file, json: write to json file, stdout: simple format written to stdout",
     )
     args = parser.parse_args()
 
+    handler = RichHandler(log_time_format="%Y-%m-%d %H-%M-%S%Z", highlighter=NullHighlighter())
+    FORMAT = "%(message)s"
+
     if args.verbose:
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.DEBUG, format=FORMAT, handlers=[handler])
     else:
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.INFO, format=FORMAT, handlers=[handler])
 
     only = set(args.only) if args.only else None
     ignore = set(args.ignore) if args.ignore else None
 
     if args.out == "xml":
         filename = "report_{}.xml".format(now().isoformat("_").replace(":", "."))
-        output = XmlReport(fspath(args.reportdir / filename), args.xslfile)
+        reportpath = args.reportdir / filename
+        output = XmlReport(reportpath, args.xslfile)
+        logger.info("Writing report to `%s`", reportpath)
+    elif args.out == "json":
+        filename = "report_{}.json".format(now().isoformat("_").replace(":", "."))
+        reportpath = args.reportdir / filename
+        output = JsonReport(reportpath)
+        logger.info("Writing report to `%s`", reportpath)
     elif args.out == "stdout":
         output = Stdout()
     else:

@@ -1,5 +1,6 @@
 from typing import Tuple
-from xml.etree.ElementTree import ParseError, parse
+
+from defusedxml.ElementTree import ParseError, parse
 
 from plug import Filetypes
 

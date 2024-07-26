@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 from genutility.args import is_file
 from send2trash import send2trash
 
-from xmlreport import load_report
+from report import load_report
 
 
 def trash_invalid(path, code, message) -> None:

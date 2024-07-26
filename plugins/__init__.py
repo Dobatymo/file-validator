@@ -7,11 +7,12 @@ __all__ = [
     "json",
     "pdf",
     "python",
+    "sfv",
+    "sqlite",
     "srt",
     "txt",
     "videos",
     "wave",
     "xml",
     "zip",
-    "sqlite",
 ]
