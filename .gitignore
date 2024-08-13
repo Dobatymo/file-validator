@@ -3,6 +3,9 @@
 # Python
 __pycache__/
 *.py[cod]
+build/
+dist/
 
 # Validator
 reports/*.xml
+reports/*.json

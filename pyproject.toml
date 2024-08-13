@@ -1,3 +1,44 @@
+[build-system]
+build-backend = "flit_core.buildapi"
+
+requires = [ "flit-core>=3.2,<4" ]
+
+[project]
+name = "file-validator"
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { file = "LICENSE" }
+authors = [ { name = "Dobatymo", email = "Dobatymo@users.noreply.github.com" } ]
+classifiers = [
+  "Intended Audience :: End Users/Desktop",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+dynamic = [ "description", "version" ]
+dependencies = [
+  "genutility[args,datetime,filesystem,json]>=0.0.107",
+  "platformdirs>=4",
+  "rich",
+  "send2trash>=1.8",
+  "typing-extensions>=4",
+]
+optional-dependencies.html = [ "beautifulsoup4", "lxml" ]
+optional-dependencies.images = [ "pillow>=8.1.1", "pillow-heif" ]
+optional-dependencies.orc = [ "pyarrow>=17" ]
+optional-dependencies.parquet = [ "pyarrow" ]
+optional-dependencies.pdf = [ "pypdf>=3.1" ]
+optional-dependencies.xml = [ "defusedxml" ]
+urls.Home = "https://github.com/Dobatymo/file-validator"
+scripts.validator = "filevalidator.validator:main"
+scripts.validator-process = "filevalidator.processreport:main"
+
+[tool.flit.module]
+name = "filevalidator"
+
 [tool.black]
 line-length = 120
 

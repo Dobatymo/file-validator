@@ -1,4 +1,0 @@
-genutility[args,datetime,filesystem,json]>=0.0.107
-rich
-Send2Trash>=1.8.0
-typing-extensions>=4.0.0
