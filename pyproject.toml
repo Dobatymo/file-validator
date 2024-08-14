@@ -28,10 +28,14 @@ dependencies = [
 ]
 optional-dependencies.html = [ "beautifulsoup4", "lxml" ]
 optional-dependencies.images = [ "pillow>=8.1.1", "pillow-heif" ]
+optional-dependencies.iso = [ "pycdlib" ]
 optional-dependencies.orc = [ "pyarrow>=17" ]
 optional-dependencies.parquet = [ "pyarrow" ]
 optional-dependencies.pdf = [ "pypdf>=3.1" ]
+optional-dependencies.raw_images = [ "rawpy" ]
+optional-dependencies.toml = [ "toml" ]
 optional-dependencies.xml = [ "defusedxml" ]
+optional-dependencies.yaml = [ "pyyaml" ]
 urls.Home = "https://github.com/Dobatymo/file-validator"
 scripts.validator = "filevalidator.validator:main"
 scripts.validator-process = "filevalidator.processreport:main"

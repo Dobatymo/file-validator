@@ -121,17 +121,17 @@ def validate_paths(
                         try:
                             config = read_json(USER_CONFIG_DIR / "config" / "{class_.__name__}.json")
                         except FileNotFoundError:
-                            logger.info("Could not find config for '%s'", class_.__name__)
+                            logger.info("Could not find config for plugin '%s'", class_.__name__)
                             config = {}
                         except ValueError:
-                            logger.exception("Could not load config for '%s'", class_.__name__)
+                            logger.exception("Could not load config for plugin '%s'", class_.__name__)
                             config = {}
                         try:
                             validator = validators[ext] = class_(**config)
                         except TypeError:
-                            logger.error("Cannot use '%s' without config", class_.__name__)
+                            logger.error("Cannot use plugin '%s' without config", class_.__name__)
                         except PluginError as e:
-                            logger.error("Cannot load '%s': %s", class_.__name__, e)
+                            logger.error("Cannot load plugin '%s': %s", class_.__name__, e)
 
             if not validator:
                 no_validators.add(ext)

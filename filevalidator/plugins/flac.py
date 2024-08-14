@@ -16,9 +16,7 @@ _is_win = platform.system() == "Windows"
 
 @Filetypes.plugin(["flac"])
 class FLAC:
-    def __init__(self, flac_binary: str = "flac", warnings_as_errors: bool = True) -> None:
-        self.wae = warnings_as_errors
-
+    def __init__(self, flac_binary: str = "flac") -> None:
         _binary = which(flac_binary)
         if _binary is None:
             raise PluginError("Cannot find flac binary executable")
@@ -30,7 +28,7 @@ class FLAC:
             path = to_dos_path(path)
 
         try:
-            if self.wae:
+            if strict:
                 cmd = [self.flac_binary, "-t", "-s", "-w", path]
             else:
                 cmd = [self.flac_binary, "-t", "-s", path]

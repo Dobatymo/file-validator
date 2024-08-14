@@ -1,4 +1,5 @@
 import logging
+import warnings
 from typing import Tuple
 
 from genutility.filesystem import fileextensions
@@ -19,9 +20,15 @@ class Images:
         register_heif_opener()
 
     def validate(self, path: str, ext: str, strict: bool = True) -> Tuple[int, str]:
+        # UserWarning: Corrupt EXIF data.  Expecting to read 2 bytes but only got 0.
+
         try:
-            with Image.open(path, "r") as img:
-                img.load()
+            with warnings.catch_warnings(record=strict) as ws:
+                warnings.simplefilter("always")
+                with Image.open(path, "r") as img:
+                    img.load()
+                if ws:
+                    return (1, "\n".join(str(w.message) for w in ws))
             return (0, "")
         except Exception as e:
             return (1, str(e))

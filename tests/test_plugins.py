@@ -4,10 +4,14 @@ from pathlib import Path
 
 from filevalidator.plugins.archives import Archives
 from filevalidator.plugins.images import Images
+from filevalidator.plugins.iso import Iso
 from filevalidator.plugins.orc import ORC
 from filevalidator.plugins.parquet import Parquet
 from filevalidator.plugins.pdf import PDF
+from filevalidator.plugins.raw_images import RawImages
 from filevalidator.plugins.srt import SRT
+from filevalidator.plugins.toml import TOML
+from filevalidator.plugins.yaml import YAML
 from filevalidator.plugins.zip import Zip
 
 
@@ -41,8 +45,20 @@ class PluginsTest(unittest.TestCase):
     def test_orc(self):
         plugin_test(self, ORC(), "orc")
 
+    def test_toml(self):
+        plugin_test(self, TOML(), "toml")
+
+    def test_yaml(self):
+        plugin_test(self, YAML(), "yaml")
+
+    def test_iso(self):
+        plugin_test(self, Iso(), "iso")
+
     def test_zip(self):
         plugin_test(self, Zip(), "zip")
+
+    def test_raw_images(self):
+        plugin_test(self, RawImages(), "raw_images")
 
     def test_archives(self):
         # plugin_test(self, Archives("UnRAR.exe", "7z.exe"), "archives")

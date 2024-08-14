@@ -15,3 +15,5 @@ class Python:
             return (0, "")
         except (SyntaxError, TypeError) as e:
             return (1, str(e))
+        except ValueError as e:  # source code string cannot contain null bytes
+            return (1, str(e))

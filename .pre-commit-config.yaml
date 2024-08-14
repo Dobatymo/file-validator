@@ -1,3 +1,4 @@
+exclude: ^test-files/
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v4.6.0
@@ -10,12 +11,10 @@ repos:
   - id: debug-statements
   - id: mixed-line-ending
     args: [--fix=no]
-    exclude: ^test-files/
   - id: requirements-txt-fixer
   - id: trailing-whitespace
     args: [--markdown-linebreak-ext=md]
   - id: end-of-file-fixer
-    exclude: ^test-files/
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
   rev: v2.14.0
   hooks:
@@ -69,3 +68,4 @@ repos:
     - rich==13.7.1
     - Send2Trash==1.8.3
     - typing-extensions>=4.0.0
+    - pycdlib==1.14.0

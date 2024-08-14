@@ -15,6 +15,7 @@ class PDF:
         try:
             with open(path, "rb") as fr:
                 with warnings.catch_warnings(record=strict) as ws:
+                    warnings.simplefilter("always")
                     pdf = PdfReader(fr, strict=True)
                     pdf.metadata  # noqa: B018
                     for _p in pdf.pages:
