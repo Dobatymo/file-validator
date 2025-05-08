@@ -71,7 +71,7 @@ class Archives:
             if m:
                 name, part, ext = m.groups()
                 if int(part) != 1:
-                    filename = f"{name}.part{(len(part)-1)*'0'}1.{ext}"
+                    filename = f"{name}.part{(len(part) - 1) * '0'}1.{ext}"
                     part_one = p.parent / filename
                     if part_one.is_file():
                         return (-2, "Skipping multi-part archive")

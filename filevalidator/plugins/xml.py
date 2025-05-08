@@ -5,7 +5,7 @@ from defusedxml.ElementTree import ParseError, parse
 from ..plug import Filetypes
 
 
-@Filetypes.plugin(["xml", "xsl", "svg", "rss", "atom", "plist", "musicxml", "dupeguru"])
+@Filetypes.plugin(["xml", "xsl", "svg", "rss", "atom", "plist", "musicxml", "dupeguru", "dupegurudirs"])
 class XML:
     def __init__(self) -> None:
         pass

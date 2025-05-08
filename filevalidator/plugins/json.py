@@ -5,7 +5,7 @@ from genutility.json import read_json
 from ..plug import Filetypes
 
 
-@Filetypes.plugin(["json"])
+@Filetypes.plugin(["json", "dtrashinfo"])
 class JSON:
     def __init__(self) -> None:
         pass

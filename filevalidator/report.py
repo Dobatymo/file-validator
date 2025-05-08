@@ -25,7 +25,7 @@ class ReportBase:
         raise NotImplementedError
 
     @staticmethod
-    def load_report(path: str, fail_on_dups: bool = True) -> Dict[str, Tuple[int, str]]:
+    def load_report(path: Path, fail_on_dups: bool = True) -> Dict[str, Tuple[int, str]]:
         raise NotImplementedError
 
 
@@ -69,19 +69,19 @@ class XmlReport(ReportBase):
         self.fp.close()
 
     @staticmethod
-    def load_report(path: str, fail_on_dups: bool = True) -> Dict[str, Tuple[int, str]]:
+    def load_report(path: Path, fail_on_dups: bool = True) -> Dict[str, Tuple[int, str]]:
         ret: Dict[str, Tuple[int, str]] = {}
 
         for _event, elem in ElementTree.iterparse(path, events=["start"]):  # nosec
             if elem.tag == "file":
-                path = elem.attrib["path"]
+                filepath = elem.attrib["path"]
                 code = int(elem.attrib["code"])
                 message = elem.text or ""
                 elem.clear()
 
-                if fail_on_dups and path in ret:
-                    raise ValueError(f"Duplicate path found: {path}")
-                ret[path] = (code, message)
+                if fail_on_dups and filepath in ret:
+                    raise ValueError(f"Duplicate path found: {filepath}")
+                ret[filepath] = (code, message)
 
         return ret
 
@@ -100,15 +100,15 @@ class JsonReport(ReportBase):
         self.jl.close()
 
     @staticmethod
-    def load_report(path: str, fail_on_dups: bool = True) -> Dict[str, Tuple[int, str]]:
+    def load_report(path: Path, fail_on_dups: bool = True) -> Dict[str, Tuple[int, str]]:
         ret: Dict[str, Tuple[int, str]] = {}
 
         for obj in json_lines.from_path(path, "rt", encoding="utf-8"):
-            path = obj["path"]
+            filepath = obj["path"]
 
-            if fail_on_dups and path in ret:
-                raise ValueError(f"Duplicate path found: {path}")
-            ret[path] = (obj["code"], obj["message"])
+            if fail_on_dups and filepath in ret:
+                raise ValueError(f"Duplicate path found: {filepath}")
+            ret[filepath] = (obj["code"], obj["message"])
 
         return ret
 

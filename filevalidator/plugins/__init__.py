@@ -1,11 +1,13 @@
 __all__ = [
     "archives",
+    "cue",
     "flac",
     "html",
     "images",
     "ini",
     "iso",
     "json",
+    "m3u",
     "orc",
     "parquet",
     "pdf",

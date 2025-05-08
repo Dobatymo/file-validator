@@ -1,27 +1,37 @@
 exclude: ^test-files/
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.6.0
+  rev: v5.0.0
   hooks:
-  - id: check-json
-  - id: check-yaml
-  - id: check-toml
-  - id: check-case-conflict
   - id: check-added-large-files
+  - id: check-case-conflict
+  - id: check-json
+  - id: check-merge-conflict
+  - id: check-symlinks
+  - id: check-toml
+  - id: check-yaml
   - id: debug-statements
+  - id: detect-private-key
+  - id: end-of-file-fixer
   - id: mixed-line-ending
-    args: [--fix=no]
+  - id: pretty-format-json
+    args: [--autofix, --no-ensure-ascii]
   - id: requirements-txt-fixer
   - id: trailing-whitespace
     args: [--markdown-linebreak-ext=md]
-  - id: end-of-file-fixer
+- repo: local
+  hooks:
+  - id: disallow-absolute-paths
+    name: disallow absolute paths
+    entry: (?i)\b[a-z]:[\/\\][^<>*\"|?]+
+    language: pygrep
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
   rev: v2.14.0
   hooks:
   - id: pretty-format-yaml
     args: [--autofix]
 - repo: https://github.com/tox-dev/pyproject-fmt
-  rev: 2.2.1
+  rev: 2.2.4
   hooks:
   - id: pyproject-fmt
 - repo: https://github.com/asottile/pyupgrade
@@ -29,43 +39,35 @@ repos:
   hooks:
   - id: pyupgrade
     args: [--py38-plus]
-- repo: https://github.com/psf/black-pre-commit-mirror
-  rev: 24.8.0
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.11.4
   hooks:
-  - id: black
-- repo: https://github.com/PyCQA/isort
-  rev: 5.13.2
-  hooks:
-  - id: isort
+  - id: ruff
+    args: [--fix]
+  - id: ruff-format
 - repo: https://github.com/PyCQA/bandit
-  rev: 1.7.9
+  rev: 1.7.10
   hooks:
   - id: bandit
     args: [-c, pyproject.toml]
     additional_dependencies: ['.[toml]']
-- repo: https://github.com/pycqa/flake8
-  rev: 7.1.1
-  hooks:
-  - id: flake8
-    additional_dependencies:
-    - flake8-annotations
-    - flake8-bugbear
-    - flake8-eradicate
-    - flake8-mutable
-    - flake8-simplify
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.11.1
+  rev: v1.14.1
   hooks:
   - id: mypy
-    args: [--ignore-missing-imports, --install-types, --non-interactive]
+    args: [--install-types, --non-interactive, --show-error-codes]
     additional_dependencies:
-    - genutility[args,datetime,filesystem,json]==0.0.107
-    - pypdf==4.3.1
-    - pillow==9.5.0
-    - platformdirs==4.2.2
-    - beautifulsoup4==4.12.3
-    - lxml==5.3.0
-    - rich==13.7.1
-    - Send2Trash==1.8.3
-    - typing-extensions>=4.0.0
+    - beautifulsoup4==4.13.4
+    - genutility[args,datetime,filesystem,json]==0.0.113
+    - lxml==5.4.0
+    - pillow==10.4.0
+    - platformdirs==4.3.6
     - pycdlib==1.14.0
+    - pypdf==4.3.1
+    - rich==14.0.0
+    - send2trash==1.8.3
+    - typing-extensions==4.13.2
+- repo: https://github.com/Yelp/detect-secrets
+  rev: v1.5.0
+  hooks:
+  - id: detect-secrets

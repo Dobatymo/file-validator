@@ -1,6 +1,5 @@
 [build-system]
 build-backend = "flit_core.buildapi"
-
 requires = [ "flit-core>=3.2,<4" ]
 
 [project]
@@ -8,6 +7,7 @@ name = "file-validator"
 readme = { file = "README.md", content-type = "text/markdown" }
 license = { file = "LICENSE" }
 authors = [ { name = "Dobatymo", email = "Dobatymo@users.noreply.github.com" } ]
+requires-python = ">=3.8"
 classifiers = [
   "Intended Audience :: End Users/Desktop",
   "Operating System :: OS Independent",
@@ -48,15 +48,27 @@ line-length = 120
 
 [tool.ruff]
 line-length = 120
-
 lint.extend-select = [
   "B",
   "I",
+]
+lint.ignore = [
+  "B011",
 ]
 
 [tool.isort]
 profile = "black"
 line_length = 120
+
+[tool.mypy]
+allow_redefinition = true
+ignore_missing_imports = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unused_ignores = true
+warn_unreachable = true
+strict_equality = true
 
 [tool.bandit]
 skips = [

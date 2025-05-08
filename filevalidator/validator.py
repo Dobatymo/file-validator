@@ -13,9 +13,8 @@ from genutility.rich import Progress
 from platformdirs import user_config_dir
 from rich.highlighter import NullHighlighter
 from rich.logging import RichHandler
-from rich.progress import BarColumn, MofNCompleteColumn
+from rich.progress import BarColumn, MofNCompleteColumn, TextColumn, TimeElapsedColumn
 from rich.progress import Progress as RichProgress
-from rich.progress import TextColumn, TimeElapsedColumn
 
 from . import plugins
 from .plug import Filetypes, Plugin, PluginError

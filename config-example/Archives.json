@@ -1,1 +1,4 @@
-{"unrar_binary": "rar", "sevenzip_binary": "7z"}
+{
+  "sevenzip_binary": "7z",
+  "unrar_binary": "rar"
+}
