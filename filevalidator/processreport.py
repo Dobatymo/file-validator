@@ -1,3 +1,4 @@
+import logging
 from argparse import ArgumentParser
 
 from genutility.args import is_file
@@ -23,7 +24,13 @@ def main():
     parser.add_argument(
         "--message-in", default=None, help="Optionally check for this string in message before applying the action"
     )
+    parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
+
+    if args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
 
     try:
         d = load_report(args.report)
@@ -34,28 +41,41 @@ def main():
 
     processed = 0
     skipped = 0
+    file_not_found = 0
     failed = 0
 
     for path, (code, message) in d.items():
         if args.message_cmp and args.message_cmp != message:
-            print("Skipping", func.__name__, path, code, message[:100])
+            logging.info("Skipping (%s): %s (%d) [%s]", func.__name__, path, code, message[:100])
             skipped += 1
             continue
 
         if args.message_in and args.message_in not in message:
-            print("Skipping", func.__name__, path, code, message[:100])
+            logging.info("Skipping (%s): %s (%d) [%s]", func.__name__, path, code, message[:100])
             skipped += 1
             continue
 
-        print("Processing", func.__name__, path, code, message[:100])
+        logging.debug("Processing (%s): %s (%d) [%s]", func.__name__, path, code, message[:100])
         try:
             func(path, code, message)
             processed += 1
+            logging.info("Processed (%s): %s", func.__name__, path)
+        except FileNotFoundError:
+            logging.debug("Processing failed (file-not-found) (%s): %s", func.__name__, path)
+            file_not_found += 1
+        except OSError as e:
+            if e.errno == 3:
+                logging.debug("Processing failed (file-not-found) (%s): %s", func.__name__, path)
+                file_not_found += 1
+            else:
+                logging.error("Processing failed (%s): %s", func.__name__, path)
+                failed += 1
+                print(e.errno)
         except Exception:
-            print("Processing failed", func.__name__, path)
+            logging.error("Processing failed (%s): %s", func.__name__, path)
             failed += 1
 
-    print("processed", processed, "skipped", skipped, "failed", failed)
+    print("processed", processed, "skipped", skipped, "file_not_found", file_not_found, "failed", failed)
 
 
 if __name__ == "__main__":

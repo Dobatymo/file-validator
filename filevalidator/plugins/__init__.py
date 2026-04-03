@@ -8,6 +8,7 @@ __all__ = [
     "iso",
     "json",
     "m3u",
+    "nfo",
     "orc",
     "parquet",
     "pdf",
