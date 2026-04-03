@@ -27,7 +27,12 @@ dependencies = [
   "typing-extensions>=4",
 ]
 optional-dependencies.html = [ "beautifulsoup4", "lxml" ]
-optional-dependencies.images = [ "pillow>=8.1.1", "pillow-heif" ]
+optional-dependencies.images = [
+  "pillow>=8.1.1; python_version<'3.9'",
+  "pillow>=11.3; python_version>='3.9'",
+  "pillow-heif; python_version>='3.9'",
+  "pillow-heif<1; python_version<'3.9'",
+]
 optional-dependencies.iso = [ "pycdlib" ]
 optional-dependencies.orc = [ "pyarrow>=17" ]
 optional-dependencies.parquet = [ "pyarrow" ]
@@ -78,4 +83,10 @@ skips = [
   "B101",
   "B404",
   "B603",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3.5",
+  "pytest-subtests>=0.13.1",
 ]

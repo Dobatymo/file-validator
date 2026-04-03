@@ -3,8 +3,7 @@ import warnings
 from typing import Tuple
 
 from genutility.filesystem import fileextensions
-from PIL import Image
-from pillow_heif import register_avif_opener, register_heif_opener
+from PIL import Image, features
 
 from ..plug import Filetypes
 
@@ -16,7 +15,15 @@ class Images:
     def __init__(self) -> None:
         logging.getLogger("PIL.PngImagePlugin").setLevel(logging.WARNING)
 
-        register_avif_opener()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=UserWarning)
+            if not features.check("avif"):
+                from pillow_heif import register_avif_opener
+
+                register_avif_opener()
+
+        from pillow_heif import register_heif_opener
+
         register_heif_opener()
 
     def validate(self, path: str, ext: str, strict: bool = True) -> Tuple[int, str]:

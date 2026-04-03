@@ -26,7 +26,7 @@ repos:
     entry: (?i)\b[a-z]:[\/\\][^<>*\"|?]+
     language: pygrep
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.14.0
+  rev: v2.15.0
   hooks:
   - id: pretty-format-yaml
     args: [--autofix]
