@@ -1,7 +1,8 @@
 import logging
+import os
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+from contextlib import suppress
 from importlib import import_module
-from os import fspath
 from pathlib import Path
 from typing import Dict, Optional, Sequence
 
@@ -82,14 +83,14 @@ def validate_paths(
     with output as report, RichProgress(*columns) as progress:
         p = Progress(progress)
         for entry in p.track(scan(paths, recursive, relative, recall)):
-            logger.debug("Processing `%s`", fspath(entry))
+            logger.debug("Processing `%s`", os.fspath(entry))
             ext = entrysuffix(entry).lower()[1:]
 
             if relative:
                 assert isinstance(entry, MyDirEntry)
                 outpath = entry.relpath
             else:
-                outpath = fspath(entry)
+                outpath = os.fspath(entry)
 
             if ext in no_validators:
                 continue
@@ -117,13 +118,18 @@ def validate_paths(
             except KeyError:
                 for class_, extensions in Filetypes.PLUGINS.items():
                     if ext in extensions:
+                        config_path = USER_CONFIG_DIR / "config" / f"{class_.__name__}.json"
                         try:
-                            config = read_json(USER_CONFIG_DIR / "config" / "{class_.__name__}.json")
+                            config = read_json(config_path)
                         except FileNotFoundError:
-                            logger.info("Could not find config for plugin '%s'", class_.__name__)
+                            logger.info(
+                                "Could not find config for plugin '%s' (%s)", class_.__name__, os.fspath(config_path)
+                            )
                             config = {}
                         except ValueError:
-                            logger.exception("Could not load config for plugin '%s'", class_.__name__)
+                            logger.exception(
+                                "Could not load config for plugin '%s' (%s)", class_.__name__, os.fspath(config_path)
+                            )
                             config = {}
                         try:
                             validator = validators[ext] = class_(**config)
@@ -140,14 +146,14 @@ def validate_paths(
             # validate file
 
             try:
-                code, message = validator.validate(fspath(entry), ext)
+                code, message = validator.validate(os.fspath(entry), ext)
             except KeyboardInterrupt:
-                logger.warning("Validating '%s' interrupted", fspath(entry))
+                logger.warning("Validating '%s' interrupted", os.fspath(entry))
                 raise
             except PluginError as e:
-                logger.warning("Validating '%s' failed: %s", fspath(entry), e)
+                logger.warning("Validating '%s' failed: %s", os.fspath(entry), e)
             except Exception:
-                logger.exception("Validating '%s' failed", fspath(entry))
+                logger.exception("Validating '%s' failed", os.fspath(entry))
             else:
                 report.write(outpath, code, message)
 
@@ -238,6 +244,9 @@ def main():
         parser.error("Invalid --out method")
 
     logger.info("Reading configs from %s", USER_CONFIG_DIR / "config")
+
+    with suppress():
+        USER_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 
     validate_paths(
         args.paths,
