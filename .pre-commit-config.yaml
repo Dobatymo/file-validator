@@ -26,31 +26,39 @@ repos:
     entry: (?i)\b[a-z]:[\/\\][^<>*\"|?]+
     language: pygrep
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.15.0
+  rev: v2.16.0
   hooks:
   - id: pretty-format-yaml
+    language_version: python3.13
     args: [--autofix]
 - repo: https://github.com/tox-dev/pyproject-fmt
-  rev: 2.2.4
+  rev: v2.21.1
   hooks:
   - id: pyproject-fmt
+    language_version: python3.13
 - repo: https://github.com/asottile/pyupgrade
   rev: v3.16.0
   hooks:
   - id: pyupgrade
     args: [--py38-plus]
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.15.10
+  rev: v0.15.11
   hooks:
   - id: ruff-check
     args: [--fix]
   - id: ruff-format
 - repo: https://github.com/PyCQA/bandit
-  rev: 1.7.10
+  rev: 1.9.4
   hooks:
   - id: bandit
     args: [-c, pyproject.toml]
     additional_dependencies: ['.[toml]']
+- repo: https://github.com/zizmorcore/zizmor-pre-commit
+  rev: v1.24.1
+  hooks:
+  - id: zizmor
+    language_version: python3.13
+    args: [--fix=safe, --offline]
 - repo: https://github.com/pre-commit/mirrors-mypy
   rev: v1.14.1
   hooks:

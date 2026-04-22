@@ -245,7 +245,7 @@ def main():
 
     logger.info("Reading configs from %s", USER_CONFIG_DIR / "config")
 
-    with suppress():
+    with suppress(OSError):
         USER_CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 
     validate_paths(

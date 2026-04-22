@@ -17,6 +17,8 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
 ]
 dynamic = [ "description", "version" ]
 dependencies = [
@@ -37,7 +39,7 @@ optional-dependencies.iso = [ "pycdlib" ]
 optional-dependencies.orc = [ "pyarrow>=17" ]
 optional-dependencies.parquet = [ "pyarrow" ]
 optional-dependencies.pdf = [ "pypdf>=3.1" ]
-optional-dependencies.raw_images = [ "rawpy" ]
+optional-dependencies.raw-images = [ "rawpy" ]
 optional-dependencies.toml = [ "toml" ]
 optional-dependencies.xml = [ "defusedxml" ]
 optional-dependencies.yaml = [ "pyyaml" ]
@@ -45,8 +47,17 @@ urls.Home = "https://github.com/Dobatymo/file-validator"
 scripts.validator = "filevalidator.validator:main"
 scripts.validator-process = "filevalidator.processreport:main"
 
-[tool.flit.module]
-name = "filevalidator"
+[dependency-groups]
+dev = [
+  "pytest>=8.3.5",
+  "pytest-subtests>=0.13.1",
+]
+
+[tool.flit]
+module.name = "filevalidator"
+
+[tool.uv]
+exclude-newer = "2 weeks"
 
 [tool.black]
 line-length = 120
@@ -55,7 +66,11 @@ line-length = 120
 line-length = 120
 lint.extend-select = [
   "B",
+  "C4",
+  "DTZ",
   "I",
+  "PIE",
+  "UP",
 ]
 lint.ignore = [
   "B011",
@@ -64,6 +79,13 @@ lint.ignore = [
 [tool.isort]
 profile = "black"
 line_length = 120
+
+[tool.bandit]
+skips = [
+  "B101",
+  "B404",
+  "B603",
+]
 
 [tool.mypy]
 allow_redefinition = true
@@ -74,19 +96,3 @@ warn_unused_configs = true
 warn_unused_ignores = true
 warn_unreachable = true
 strict_equality = true
-
-[tool.uv]
-exclude-newer = "2 weeks"
-
-[tool.bandit]
-skips = [
-  "B101",
-  "B404",
-  "B603",
-]
-
-[dependency-groups]
-dev = [
-  "pytest>=8.3.5",
-  "pytest-subtests>=0.13.1",
-]

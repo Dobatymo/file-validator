@@ -10,7 +10,6 @@ class TXT:
 
     def __init__(self) -> None:
         """Constructor is called once per program run."""
-        pass
 
     def validate(self, path: str, ext: str, strict: bool = True) -> Tuple[int, str]:
         """validate() is called for every file
