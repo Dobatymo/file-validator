@@ -1,7 +1,8 @@
 import logging
+import os
 import subprocess
 from shutil import which
-from typing import Tuple
+from typing import Optional, Tuple
 
 from genutility.filesystem import fileextensions
 from genutility.subprocess import force_decode
@@ -13,7 +14,8 @@ logger = logging.getLogger(__name__)
 
 @Filetypes.plugin(fileextensions.video)
 class Videos:
-    def __init__(self, ffmpeg_binary: str = "ffmpeg") -> None:
+    def __init__(self, ffmpeg_binary: Optional[str] = None) -> None:
+        ffmpeg_binary = ffmpeg_binary or os.environ.get("FFMPEG_BINARY", "ffmpeg")
         _binary = which(ffmpeg_binary)
         if _binary is None:
             raise PluginError("Cannot find ffmpeg binary executable")

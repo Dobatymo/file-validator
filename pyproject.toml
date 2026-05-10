@@ -64,6 +64,7 @@ line-length = 120
 
 [tool.ruff]
 line-length = 120
+extend-exclude = [ "test-files/python/bad.*.py" ]
 lint.extend-select = [
   "B",
   "C4",

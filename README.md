@@ -44,6 +44,11 @@ optional arguments:
 ## Example
 - `py -m filevalidator.validator "C:\PUBLIC"`
 
+## Tests
+
+- `python -m pytest`
+- The video plugin tests use the `FFMPEG_BINARY` environment variable if set, otherwise they fall back to `ffmpeg` on `PATH`. If no FFmpeg executable is available, those tests are skipped.
+
 ## Non-Python dependencies
 
 * Plugins:
