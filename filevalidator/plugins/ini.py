@@ -12,9 +12,10 @@ class INI:
     def validate(self, path: str, ext: str, strict: bool = True) -> Tuple[int, str]:
         try:
             config = configparser.ConfigParser()
-            config.read(path)
+            # Use the locale default on purpose: INI files are often written in the local encoding, and
+            # running Python in UTF-8 mode can change that default.
+            with open(path, encoding=None) as fr:
+                config.read_file(fr)
             return (0, "")
-        except configparser.MissingSectionHeaderError as e:
-            return (1, str(e))
-        except Exception as e:
+        except (OSError, UnicodeDecodeError, configparser.Error) as e:
             return (1, str(e))

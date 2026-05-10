@@ -5,6 +5,7 @@ from pathlib import Path
 from filevalidator.plug import PluginError
 from filevalidator.plugins.archives import Archives
 from filevalidator.plugins.images import Images
+from filevalidator.plugins.ini import INI
 from filevalidator.plugins.iso import Iso
 from filevalidator.plugins.orc import ORC
 from filevalidator.plugins.parquet import Parquet
@@ -44,6 +45,9 @@ class PluginsTest(unittest.TestCase):
 
     def test_images(self):
         plugin_test(self, Images(), "images")
+
+    def test_ini(self):
+        plugin_test(self, INI(), "ini")
 
     def test_parquet(self):
         plugin_test(self, Parquet(), "parquet")
