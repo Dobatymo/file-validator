@@ -16,7 +16,9 @@ class Zip:
     def validate(self, path: str, ext: str, strict: bool = True) -> Tuple[int, str]:
         try:
             with ZipFile(path, "r") as z:
-                z.testzip()
+                bad_member = z.testzip()
+                if bad_member is not None:
+                    return (1, f"CRC check failed for file: {bad_member}")
 
             return (0, "")
         except BadZipFile as e:
