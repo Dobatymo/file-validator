@@ -33,12 +33,6 @@ class ReportData(dict):
 
 
 class ReportBase:
-    def __enter__(self) -> Self:
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
-
     def write(self, path: str, entry: ReportEntry) -> None:
         raise NotImplementedError
 
@@ -51,6 +45,12 @@ class ReportBase:
     @staticmethod
     def load_report(path: Path, fail_on_dups: bool = True) -> ReportData:
         raise NotImplementedError
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
 
 
 class Stdout(ReportBase):

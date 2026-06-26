@@ -13,14 +13,14 @@ class CapturingReport:
     def __init__(self) -> None:
         self.rows: List[Tuple[str, ReportEntry]] = []
 
+    def write(self, path: str, entry: ReportEntry) -> None:
+        self.rows.append((path, entry))
+
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         pass
-
-    def write(self, path: str, entry: ReportEntry) -> None:
-        self.rows.append((path, entry))
 
 
 class ValidatorTest(unittest.TestCase):
