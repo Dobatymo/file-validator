@@ -16,6 +16,11 @@ BAD_JSONLZ4_JSON = TEST_FILES / "jsonlz4" / "bad.json.jsonlz4"
 BAD_JSONLZ4_TRUNCATED = TEST_FILES / "jsonlz4" / "bad.truncated.jsonlz4"
 BAD_INVALID_UTF8_M3U8 = TEST_FILES / "m3u8" / "bad.invalid-utf8.m3u8"
 BAD_CONTROL_CHARS_NFO = TEST_FILES / "nfo" / "bad.control-chars.nfo"
+GOOD_VOBSUB_IDX = TEST_FILES / "vobsub" / "good.idx"
+BAD_VOBSUB_IDX = TEST_FILES / "vobsub" / "bad.timestamp.idx"
+GOOD_VOBSUB_SUB = TEST_FILES / "vobsub" / "good.sub"
+BAD_VOBSUB_SUB = TEST_FILES / "vobsub" / "bad.not-vobsub.sub"
+BAD_TRUNCATED_VOBSUB_SUB = TEST_FILES / "vobsub" / "bad.truncated.sub"
 
 
 def write_bytes(path: Path, data: bytes) -> None:
@@ -100,6 +105,32 @@ def create_jsonlz4_files() -> None:
     write_bytes(BAD_JSONLZ4_TRUNCATED, good[:-3])
 
 
+def create_vobsub_files() -> None:
+    write_bytes(
+        GOOD_VOBSUB_IDX,
+        b"""# VobSub index file, v7 (do not modify this line!)
+size: 720x480
+palette: 000000, ffffff, 808080, c0c0c0, ff0000, 00ff00, 0000ff, ffff00, 00ffff, ff00ff, 800000, 008000, 000080, 808000, 008080, 800080
+langidx: 0
+id: en, index: 0
+delay: +00:00:00:000
+timestamp: -00:00:00:080, filepos: 000000000
+timestamp: 00:00:01:000, filepos: 000001000
+\0""",
+    )
+    write_bytes(
+        BAD_VOBSUB_IDX,
+        b"""# VobSub index file, v7 (do not modify this line!)
+size: 720x480
+timestamp: broken, filepos: 000000000
+""",
+    )
+    pack = b"\x00\x00\x01\xba\x44\x00\x04\x00\x04\x01\x01\x89\xc3\xf8"
+    write_bytes(GOOD_VOBSUB_SUB, pack + b"\x00\x00\x01\xbd\x00\x04\x20\x00\x00\x00")
+    write_bytes(BAD_VOBSUB_SUB, b"not a vobsub sub file")
+    write_bytes(BAD_TRUNCATED_VOBSUB_SUB, pack + b"\x00\x00\x01\xbd\x00\x04\x20")
+
+
 def main() -> None:
     create_sqlite(GOOD_SQLITE)
     create_wave(GOOD_WAVE)
@@ -107,6 +138,7 @@ def main() -> None:
     create_animated_gifs(GOOD_ANIMATED_GIF, BAD_TRUNCATED_ANIMATED_GIF)
     create_pdf_with_corrupt_stream(BAD_PDF_STREAM)
     create_jsonlz4_files()
+    create_vobsub_files()
     write_bytes(BAD_INVALID_UTF8_M3U8, bytes([0xFF, 0xFE, 0xFA]))
     write_bytes(
         BAD_CONTROL_CHARS_NFO,

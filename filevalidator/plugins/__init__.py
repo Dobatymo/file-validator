@@ -22,6 +22,7 @@ __all__ = [
     "toml",
     "txt",
     "videos",
+    "vobsub",
     "wave",
     "xml",
     "yaml",

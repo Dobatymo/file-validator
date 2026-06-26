@@ -26,6 +26,7 @@ from filevalidator.plugins.sqlite import Sqlite
 from filevalidator.plugins.srt import SRT
 from filevalidator.plugins.toml import TOML
 from filevalidator.plugins.videos import Videos
+from filevalidator.plugins.vobsub import VobSub
 from filevalidator.plugins.wave import WAVE
 from filevalidator.plugins.xml import XML
 from filevalidator.plugins.yaml import YAML
@@ -141,6 +142,9 @@ class PluginsTest(unittest.TestCase):
             plugin_test(self, Videos(), "videos")
         except PluginError as e:
             self.skipTest(f"Skipping due to: {e}")
+
+    def test_vobsub(self):
+        plugin_test(self, VobSub(), "vobsub")
 
     def test_archives(self):
         try:

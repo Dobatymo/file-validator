@@ -20,6 +20,11 @@ This covers:
 - `test-files/jsonlz4/bad.magic.jsonlz4`
 - `test-files/jsonlz4/bad.json.jsonlz4`
 - `test-files/jsonlz4/bad.truncated.jsonlz4`
+- `test-files/vobsub/good.idx`
+- `test-files/vobsub/bad.timestamp.idx`
+- `test-files/vobsub/good.sub`
+- `test-files/vobsub/bad.not-vobsub.sub`
+- `test-files/vobsub/bad.truncated.sub`
 - `test-files/m3u8/bad.invalid-utf8.m3u8`
 - `test-files/nfo/bad.control-chars.nfo`
 
