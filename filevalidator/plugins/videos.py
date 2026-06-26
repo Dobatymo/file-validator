@@ -1,39 +1,37 @@
 import logging
 import os
-import subprocess
 from shutil import which
-from typing import Optional, Tuple
+from typing import Optional
 
 from genutility.filesystem import fileextensions
-from genutility.subprocess import force_decode
 
-from ..plug import Filetypes, PluginError
+from ..limits import CommandError, CommandTimeout, run_command, timeout_result
+from ..plug import Filetypes, PluginError, ValidationResult
 
 logger = logging.getLogger(__name__)
 
 
 @Filetypes.plugin(fileextensions.video)
 class Videos:
-    def __init__(self, ffmpeg_binary: Optional[str] = None) -> None:
-        ffmpeg_binary = ffmpeg_binary or os.environ.get("FFMPEG_BINARY", "ffmpeg")
-        _binary = which(ffmpeg_binary)
+    def __init__(self, ffmpeg_binary: Optional[str] = None, timeout: Optional[float] = 3600) -> None:
+        self.timeout = timeout
+        binary = ffmpeg_binary or os.environ.get("FFMPEG_BINARY") or "ffmpeg"
+        _binary = which(binary)
         if _binary is None:
             raise PluginError("Cannot find ffmpeg binary executable")
         else:
             self.ffmpeg_binary = _binary
 
-    def validate(self, path: str, ext: str, strict: bool = True) -> Tuple[int, str]:
+    def validate(self, path: str, ext: str, file_size: int, strict: bool = True) -> ValidationResult:
         cmd = [self.ffmpeg_binary, "-v", "error", "-nostats", "-i", path, "-f", "null", "-"]
         try:
-            ret = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-            output = force_decode(ret).strip()
+            output = run_command(cmd, self.timeout)
             if output:
                 return (1, output)
             else:
                 return (0, "")
-        except subprocess.CalledProcessError as e:
+        except CommandError as e:
             logger.error("ffmpeg failed for `%s`", path)
-            output = force_decode(e.output).strip()
-            return (1, output)
-        # except OSError:
-        #    logger.error("calling ffmpeg failed for '{}'".format(path))
+            return (1, e.output)
+        except CommandTimeout as e:
+            return timeout_result(cmd, self.timeout, e.output)

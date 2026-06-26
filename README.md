@@ -49,12 +49,19 @@ optional arguments:
 - `python -m pytest`
 - The video plugin tests use the `FFMPEG_BINARY` environment variable if set, otherwise they fall back to `ffmpeg` on `PATH`. If no FFmpeg executable is available, those tests are skipped.
 
+## Processing reports
+
+Reports record each file's size and, when available, nanosecond modification time from immediately before validation. `validator-process` always checks the size and also checks the modification time when it was recorded. `--ignore-mtime` disables only the modification-time check; the file size must still match.
+
+`--relative` requires exactly one input directory. XML reports store that directory as their base, and `validator-process` resolves relative entries against it. Pass `--base DIRECTORY` to override the stored base, for example after moving the scanned directory. Relative reports without stored base metadata require `--base` before they can be processed.
+
 ## Non-Python dependencies
 
 * Plugins:
   * Archives: rar and 7z executable, must be in path, or set path in plugin config
   * Videos: ffmpeg executable, must be in path, or set path in plugin config
   * FLAC: flac executable, must be in path, or set path in plugin config
+  * PDF: qpdf executable is used when available, or set its path in plugin config; pypdf remains the fallback
 
 Plugin configs are JSON files loaded from `C:\Users\<username>\AppData\Local\Dobatymo\file-validator\config` (on Windows). See `config-example` for examples JSON files.
 

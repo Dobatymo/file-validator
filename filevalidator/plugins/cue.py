@@ -1,8 +1,7 @@
 import codecs
 import re
-from typing import Tuple
 
-from ..plug import Filetypes
+from ..plug import Filetypes, ValidationResult
 
 
 @Filetypes.plugin(["cue"])
@@ -44,7 +43,7 @@ class CUE:
                 return encoding
         return default
 
-    def validate(self, path: str, ext: str, strict: bool = True) -> Tuple[int, str]:
+    def validate(self, path: str, ext: str, file_size: int, strict: bool = True) -> ValidationResult:
         encoding = self.get_encoding(path)
 
         with open(path, encoding=encoding) as fr:

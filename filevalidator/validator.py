@@ -19,7 +19,7 @@ from rich.progress import Progress as RichProgress
 
 from . import plugins
 from .plug import Filetypes, Plugin, PluginError
-from .report import JsonReport, ReportBase, Stdout, XmlReport, load_report
+from .report import JsonReport, ReportBase, ReportData, ReportEntry, Stdout, XmlReport, load_report
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +29,39 @@ APP_NAME = "file-validator"
 APP_AUTHOR = "Dobatymo"
 
 USER_CONFIG_DIR = Path(user_config_dir(APP_NAME, APP_AUTHOR))
+ALLOW_RESUME_BASE_CHANGE_FLAG = "--allow-resume-base-change"
+
+
+def get_relative_report_base(paths: Sequence[Path], relative: bool) -> Optional[str]:
+    if not relative:
+        return None
+    if len(paths) != 1:
+        raise ValueError("--relative requires exactly one input directory")
+    return os.path.abspath(paths[0])
+
+
+def normalize_base(path: str) -> str:
+    return os.path.normcase(os.path.abspath(path))
+
+
+def load_resume_info(
+    resumefile: Optional[Path],
+    paths: Sequence[Path],
+    relative: bool,
+    allow_resume_base_change: bool = False,
+) -> ReportData:
+    if resumefile is None:
+        return ReportData()
+
+    resume_info = load_report(resumefile)
+    current_base = get_relative_report_base(paths, relative)
+    if current_base is not None and resume_info.base is not None and not allow_resume_base_change:
+        if normalize_base(resume_info.base) != normalize_base(current_base):
+            raise ValueError(
+                f"Resume report base {resume_info.base!r} does not match current --relative base {current_base!r}. "
+                f"Use {ALLOW_RESUME_BASE_CHANGE_FLAG} to reuse resume data from a different base."
+            )
+    return resume_info
 
 
 def scan(paths: Sequence[Path], recursive: bool, relative: bool, recall: bool):
@@ -49,13 +82,18 @@ def scan(paths: Sequence[Path], recursive: bool, relative: bool, recall: bool):
 def validate_paths(
     paths: Sequence[Path],
     output: ReportBase,
-    resumefile: Optional[Path] = None,
     recursive: bool = False,
     relative: bool = False,
     recall: bool = False,
     only: Optional[set] = None,
     ignore: Optional[set] = None,
+    resume_info: Optional[ReportData] = None,
 ) -> None:
+    get_relative_report_base(paths, relative)
+
+    if resume_info is None:
+        resume_info = ReportData()
+
     for name in plugins.__all__:
         try:
             import_module(".plugins." + name, __package__)
@@ -64,11 +102,6 @@ def validate_paths(
 
     for class_, extensions in Filetypes.PLUGINS.items():
         logger.info("Loaded Filetype plugin %s for: %s", class_.__name__, ", ".join(extensions))
-
-    if resumefile:
-        resume_info = load_report(resumefile)
-    else:
-        resume_info = {}
 
     validators: Dict[str, Plugin] = {}
     no_validators = ignore or set()
@@ -99,16 +132,26 @@ def validate_paths(
                 no_validators.add(ext)
                 continue
 
+            try:
+                stat = os.stat(entry)
+            except OSError as e:
+                logger.warning("Could not stat '%s' before validation: %s", os.fspath(entry), e)
+                continue
+
             # check if resume info available
 
             try:
-                code, message = resume_info[outpath]
+                resume_entry = resume_info[outpath]
             except KeyError:
                 pass
             else:
-                logger.debug("Copied information for %s", outpath)
-                report.write(outpath, code, message)
-                continue
+                if resume_entry.size == stat.st_size and (
+                    resume_entry.mtime_ns is None or resume_entry.mtime_ns == stat.st_mtime_ns
+                ):
+                    logger.debug("Copied information for %s", outpath)
+                    report.write(outpath, resume_entry)
+                    continue
+                logger.debug("Ignoring stale resume information for %s", outpath)
 
             # get validator for ext
 
@@ -146,16 +189,25 @@ def validate_paths(
             # validate file
 
             try:
-                code, message = validator.validate(os.fspath(entry), ext)
+                code, message = validator.validate(os.fspath(entry), ext, stat.st_size)
             except KeyboardInterrupt:
                 logger.warning("Validating '%s' interrupted", os.fspath(entry))
                 raise
+            except OSError as e:
+                logger.warning("Validating '%s' failed due to file access error: %s", os.fspath(entry), e)
+                report.write(
+                    outpath,
+                    ReportEntry(code=-1, message=str(e), size=stat.st_size, mtime_ns=stat.st_mtime_ns),
+                )
             except PluginError as e:
                 logger.warning("Validating '%s' failed: %s", os.fspath(entry), e)
             except Exception:
                 logger.exception("Validating '%s' failed", os.fspath(entry))
             else:
-                report.write(outpath, code, message)
+                report.write(
+                    outpath,
+                    ReportEntry(code=code, message=message, size=stat.st_size, mtime_ns=stat.st_mtime_ns),
+                )
 
 
 # from gooey import Gooey
@@ -203,6 +255,11 @@ def main():
     )
     parser.add_argument("--resume", type=is_file, help="Resume validation using a previous XML report")
     parser.add_argument(
+        ALLOW_RESUME_BASE_CHANGE_FLAG,
+        action="store_true",
+        help="Allow --resume to reuse relative report entries even when the stored report base differs from the current input directory",
+    )
+    parser.add_argument(
         "paths",
         metavar="DIRECTORY",
         nargs="+",
@@ -216,6 +273,16 @@ def main():
         help="Output method. xml: write to xml file, json: write to json file, stdout: simple format written to stdout",
     )
     args = parser.parse_args()
+
+    try:
+        report_base = get_relative_report_base(args.paths, args.relative)
+    except ValueError as e:
+        parser.error(str(e))
+
+    try:
+        resume_info = load_resume_info(args.resume, args.paths, args.relative, args.allow_resume_base_change)
+    except ValueError as e:
+        parser.error(str(e))
 
     handler = RichHandler(log_time_format="%Y-%m-%d %H-%M-%S%Z", highlighter=NullHighlighter())
     FORMAT = "%(message)s"
@@ -231,7 +298,7 @@ def main():
     if args.out == "xml":
         filename = "report_{}.xml".format(now().isoformat("_").replace(":", "."))
         reportpath = args.reportdir / filename
-        output = XmlReport(reportpath, args.xslfile)
+        output = XmlReport(reportpath, args.xslfile, base=report_base)
         logger.info("Writing report to `%s`", reportpath)
     elif args.out == "json":
         filename = "report_{}.json".format(now().isoformat("_").replace(":", "."))
@@ -251,12 +318,12 @@ def main():
     validate_paths(
         args.paths,
         output,
-        args.resume,
         args.recursive,
         args.relative,
         args.recall,
         only,
         ignore,
+        resume_info=resume_info,
     )
 
 

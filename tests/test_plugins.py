@@ -1,10 +1,14 @@
 import os
+import sys
+import tempfile
 import unittest
 from pathlib import Path
 
+from filevalidator.limits import CommandError, CommandTimeout, check_file_size, run_command, timeout_result
 from filevalidator.plug import PluginError
 from filevalidator.plugins.archives import Archives
 from filevalidator.plugins.cue import CUE
+from filevalidator.plugins.executable import Executable
 from filevalidator.plugins.images import Images
 from filevalidator.plugins.ini import INI
 from filevalidator.plugins.iso import Iso
@@ -30,7 +34,7 @@ from filevalidator.plugins.zip import Zip
 def plugin_test(self, instance, name: str) -> None:
     for path in (Path("test-files") / name).glob("*"):
         with self.subTest(path=path):
-            code, message = instance.validate(os.fspath(path), path.suffix[1:], strict=True)
+            code, message = instance.validate(os.fspath(path), path.suffix[1:], path.stat().st_size, strict=True)
             if path.name.startswith("good"):
                 truth = 0
             elif path.name.startswith("bad"):
@@ -47,11 +51,32 @@ def plugin_test(self, instance, name: str) -> None:
 
 
 class PluginsTest(unittest.TestCase):
+    def test_cue(self):
+        plugin_test(self, CUE(), "cue")
+
+    def test_executable(self):
+        plugin_test(self, Executable(), "executable")
+
     def test_pdf(self):
         plugin_test(self, PDF(), "pdf")
 
-    def test_cue(self):
-        plugin_test(self, CUE(), "cue")
+    def test_pdf_qpdf_detects_corrupt_stream(self):
+        instance = PDF(qpdf_binary=os.environ.get("QPDF_BINARY"))
+        if instance.qpdf_binary is None:
+            self.skipTest("qpdf is not available")
+
+        path = Path("test-files/pdf/bad.stream.badtest.pdf")
+        code, message = instance.validate(os.fspath(path), "pdf", path.stat().st_size)
+
+        self.assertEqual(1, code, message)
+
+    def test_pdf_falls_back_to_pypdf(self):
+        instance = PDF(qpdf_binary="file-validator-definitely-missing-qpdf")
+        path = Path("test-files/pdf/good.pdf")
+
+        code, message = instance.validate(os.fspath(path), "pdf", path.stat().st_size)
+
+        self.assertEqual(0, code, message)
 
     def test_srt(self):
         plugin_test(self, SRT(), "srt")
@@ -119,3 +144,74 @@ class PluginsTest(unittest.TestCase):
             plugin_test(self, Archives("Rar.exe", "7z.exe"), "archives")
         except PluginError as e:
             self.skipTest(f"Skipping due to: {e}")
+
+    def test_archive_error_identifies_missing_executable(self):
+        instance = object.__new__(Archives)
+        instance.timeout = 1
+        instance.unrar_binary = Path("rar")
+        instance.sevenzip_binary = None
+        instance.unrar_binary_config = "rar"
+        instance.sevenzip_binary_config = "missing-7z"
+
+        with self.assertRaisesRegex(PluginError, "extension '7z'.*missing-7z"):
+            instance.validate("sample.7z", "7z", 0)
+
+    def test_archive_error_identifies_unimplemented_format(self):
+        instance = object.__new__(Archives)
+        instance.timeout = 1
+        instance.unrar_binary = Path("rar")
+        instance.sevenzip_binary = Path("7z")
+        instance.unrar_binary_config = "rar"
+        instance.sevenzip_binary_config = "7z"
+
+        with self.assertRaisesRegex(PluginError, "extension 'wim'.*not implemented"):
+            instance.validate("sample.wim", "wim", 0)
+
+
+class ResourceLimitsTest(unittest.TestCase):
+    def test_oversize_returns_unable_to_validate(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "sample.json"
+            path.write_text("{}", encoding="utf-8")
+
+            code, message = JSON(max_file_size=1).validate(os.fspath(path), "json", path.stat().st_size)
+
+        self.assertEqual(-1, code)
+        self.assertIn("File too large", message)
+
+    def test_extension_size_override_takes_precedence(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "sample.json"
+            path.write_text("{}", encoding="utf-8")
+
+            result = check_file_size(path.stat().st_size, "json", 1, {"json": 10})
+
+        self.assertIsNone(result)
+
+    def test_none_size_limit_disables_size_check(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "sample.json"
+            path.write_text("{}", encoding="utf-8")
+
+            result = check_file_size(path.stat().st_size, "json", None)
+
+        self.assertIsNone(result)
+
+    def test_subprocess_timeout_maps_to_unable_to_validate(self):
+        cmd = [sys.executable, "-c", "import time; time.sleep(1)"]
+
+        with self.assertRaises(CommandTimeout) as cm:
+            run_command(cmd, 0.01)
+
+        code, message = timeout_result(cmd, 0.01, cm.exception.output)
+        self.assertEqual(-1, code)
+        self.assertIn("Timed out", message)
+
+    def test_subprocess_failure_output_is_decoded_text(self):
+        cmd = [sys.executable, "-c", "import sys; sys.stdout.buffer.write(bytes([0xff])); raise SystemExit(1)"]
+
+        with self.assertRaises(CommandError) as cm:
+            run_command(cmd, 1)
+
+        self.assertIsInstance(cm.exception.output, str)
+        self.assertEqual("\xff", cm.exception.output)

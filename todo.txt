@@ -1,1 +1,2 @@
 unicode not working (at least for flac.exe)
+rar validation does not support timeout because genutility.fileformats.rar.Rar.test() owns the subprocess call

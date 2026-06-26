@@ -1,3 +1,4 @@
 {
-  "ffmpeg_binary": "ffmpeg"
+  "ffmpeg_binary": "ffmpeg",
+  "timeout": 3600
 }

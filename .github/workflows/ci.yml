@@ -44,16 +44,16 @@ jobs:
     - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install FFmpeg
+    - name: Install external validators
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y ffmpeg
-    - name: Install FFmpeg
+        sudo apt-get install -y ffmpeg qpdf
+    - name: Install external validators
       if: runner.os == 'macOS'
       run: |
         brew update
-        brew install ffmpeg
+        brew install ffmpeg qpdf
     - name: Install dependencies
       run: uv sync --all-extras
     - name: Run tests

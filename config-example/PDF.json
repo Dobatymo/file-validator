@@ -1,0 +1,8 @@
+{
+  "max_file_size": 1073741824,
+  "max_file_size_by_extension": {
+    "pdf": 2147483648
+  },
+  "qpdf_binary": "qpdf",
+  "timeout": 3600
+}

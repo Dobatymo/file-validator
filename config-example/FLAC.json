@@ -1,3 +1,4 @@
 {
-  "flac_binary": "flac"
+  "flac_binary": "flac",
+  "timeout": 3600
 }

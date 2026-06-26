@@ -1,4 +1,5 @@
 {
   "sevenzip_binary": "7z",
+  "timeout": 86400,
   "unrar_binary": "rar"
 }

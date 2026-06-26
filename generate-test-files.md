@@ -12,6 +12,10 @@ This covers:
 
 - `test-files/sqlite/good.sqlite`
 - `test-files/wave/good.wav`
+- `test-files/wave/bad.truncated-data.wav`
+- `test-files/images/good.animated.gif`
+- `test-files/images/bad.truncated-later-frame.gif`
+- `test-files/pdf/bad.stream.badtest.pdf`
 - `test-files/m3u8/bad.invalid-utf8.m3u8`
 - `test-files/nfo/bad.control-chars.nfo`
 

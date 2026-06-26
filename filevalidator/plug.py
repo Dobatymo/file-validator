@@ -1,8 +1,10 @@
 from typing import Dict, Protocol, Set, Tuple, Type
 
+ValidationResult = Tuple[int, str]
+
 
 class Plugin(Protocol):
-    def validate(self, path: str, ext: str, strict: bool = True) -> Tuple[int, str]: ...
+    def validate(self, path: str, ext: str, file_size: int, strict: bool = True) -> ValidationResult: ...
 
 
 class PluginError(Exception):

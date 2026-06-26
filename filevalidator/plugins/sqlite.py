@@ -1,9 +1,8 @@
 import sqlite3
-from typing import Tuple
 
 from genutility.sqlite import to_uri
 
-from ..plug import Filetypes
+from ..plug import Filetypes, ValidationResult
 
 
 @Filetypes.plugin(["sqlite", "sqlite3"])
@@ -11,7 +10,7 @@ class Sqlite:
     def __init__(self) -> None:
         pass
 
-    def validate(self, path: str, ext: str, strict: bool = True) -> Tuple[int, str]:
+    def validate(self, path: str, ext: str, file_size: int, strict: bool = True) -> ValidationResult:
         try:
             uri = to_uri(path, mode="ro")
             con = sqlite3.connect(uri, uri=True)

@@ -1,6 +1,7 @@
 __all__ = [
     "archives",
     "cue",
+    "executable",
     "flac",
     "html",
     "images",

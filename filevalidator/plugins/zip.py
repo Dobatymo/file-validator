@@ -1,9 +1,8 @@
 import re
 import zlib
-from typing import Tuple
 from zipfile import BadZipFile, ZipFile
 
-from ..plug import Filetypes
+from ..plug import Filetypes, ValidationResult
 
 
 @Filetypes.plugin(
@@ -13,7 +12,7 @@ class Zip:
     def __init__(self) -> None:
         pass
 
-    def validate(self, path: str, ext: str, strict: bool = True) -> Tuple[int, str]:
+    def validate(self, path: str, ext: str, file_size: int, strict: bool = True) -> ValidationResult:
         try:
             with ZipFile(path, "r") as z:
                 bad_member = z.testzip()
