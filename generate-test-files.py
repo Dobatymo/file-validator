@@ -10,6 +10,10 @@ BAD_TRUNCATED_WAVE = TEST_FILES / "wave" / "bad.truncated-data.wav"
 GOOD_ANIMATED_GIF = TEST_FILES / "images" / "good.animated.gif"
 BAD_TRUNCATED_ANIMATED_GIF = TEST_FILES / "images" / "bad.truncated-later-frame.gif"
 BAD_PDF_STREAM = TEST_FILES / "pdf" / "bad.stream.badtest.pdf"
+GOOD_JSONLZ4 = TEST_FILES / "jsonlz4" / "good.jsonlz4"
+BAD_JSONLZ4_MAGIC = TEST_FILES / "jsonlz4" / "bad.magic.jsonlz4"
+BAD_JSONLZ4_JSON = TEST_FILES / "jsonlz4" / "bad.json.jsonlz4"
+BAD_JSONLZ4_TRUNCATED = TEST_FILES / "jsonlz4" / "bad.truncated.jsonlz4"
 BAD_INVALID_UTF8_M3U8 = TEST_FILES / "m3u8" / "bad.invalid-utf8.m3u8"
 BAD_CONTROL_CHARS_NFO = TEST_FILES / "nfo" / "bad.control-chars.nfo"
 
@@ -85,12 +89,24 @@ def create_pdf_with_corrupt_stream(path: Path) -> None:
     write_bytes(path, bytes(data))
 
 
+def create_jsonlz4_files() -> None:
+    import lz4.block
+
+    magic = b"mozLz40\0"
+    good = magic + lz4.block.compress(b'{"ok": true}')
+    write_bytes(GOOD_JSONLZ4, good)
+    write_bytes(BAD_JSONLZ4_MAGIC, b"badmagic" + good[len(magic) :])
+    write_bytes(BAD_JSONLZ4_JSON, magic + lz4.block.compress(b"not json"))
+    write_bytes(BAD_JSONLZ4_TRUNCATED, good[:-3])
+
+
 def main() -> None:
     create_sqlite(GOOD_SQLITE)
     create_wave(GOOD_WAVE)
     create_truncated_wave(GOOD_WAVE, BAD_TRUNCATED_WAVE)
     create_animated_gifs(GOOD_ANIMATED_GIF, BAD_TRUNCATED_ANIMATED_GIF)
     create_pdf_with_corrupt_stream(BAD_PDF_STREAM)
+    create_jsonlz4_files()
     write_bytes(BAD_INVALID_UTF8_M3U8, bytes([0xFF, 0xFE, 0xFA]))
     write_bytes(
         BAD_CONTROL_CHARS_NFO,

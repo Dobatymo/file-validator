@@ -16,6 +16,10 @@ This covers:
 - `test-files/images/good.animated.gif`
 - `test-files/images/bad.truncated-later-frame.gif`
 - `test-files/pdf/bad.stream.badtest.pdf`
+- `test-files/jsonlz4/good.jsonlz4`
+- `test-files/jsonlz4/bad.magic.jsonlz4`
+- `test-files/jsonlz4/bad.json.jsonlz4`
+- `test-files/jsonlz4/bad.truncated.jsonlz4`
 - `test-files/m3u8/bad.invalid-utf8.m3u8`
 - `test-files/nfo/bad.control-chars.nfo`
 

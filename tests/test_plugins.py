@@ -13,6 +13,7 @@ from filevalidator.plugins.images import Images
 from filevalidator.plugins.ini import INI
 from filevalidator.plugins.iso import Iso
 from filevalidator.plugins.json import JSON
+from filevalidator.plugins.jsonlz4 import JSONLZ4
 from filevalidator.plugins.m3u import M3U8
 from filevalidator.plugins.nfo import NFO
 from filevalidator.plugins.orc import ORC
@@ -89,6 +90,9 @@ class PluginsTest(unittest.TestCase):
 
     def test_json(self):
         plugin_test(self, JSON(), "json")
+
+    def test_jsonlz4(self):
+        plugin_test(self, JSONLZ4(), "jsonlz4")
 
     def test_m3u8(self):
         plugin_test(self, M3U8(), "m3u8")

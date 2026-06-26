@@ -40,6 +40,7 @@ optional-dependencies.images = [
   "pillow-heif<1; python_version<'3.9'",
 ]
 optional-dependencies.iso = [ "pycdlib" ]
+optional-dependencies.jsonlz4 = [ "lz4" ]
 optional-dependencies.orc = [ "pyarrow>=17" ]
 optional-dependencies.parquet = [ "pyarrow" ]
 optional-dependencies.pdf = [

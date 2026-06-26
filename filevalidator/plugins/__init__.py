@@ -8,6 +8,7 @@ __all__ = [
     "ini",
     "iso",
     "json",
+    "jsonlz4",
     "m3u",
     "nfo",
     "orc",
